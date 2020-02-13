@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae0543fe805424df99fe08ce744cbe49, type: 3}
+  m_Name: appearance2
+  m_EditorClassIdentifier: 
+  m_PoseEntries:
+  - path: body_lower
+    localPosition: {x: 0, y: 0, z: 0}
+    localRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper
+    localPosition: {x: 1.0000001, y: 0, z: 0}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_R
+    localPosition: {x: 0.7604886, y: 0.2400186, z: -0.15136719}
+    localRotation: {x: 0, y: 0, z: 0.6195594, w: 0.78494984}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_R/scapula_R
+    localPosition: {x: 0.6417306, y: -0.0000006556511, z: 0}
+    localRotation: {x: 0, y: 0, z: 0.6024784, w: 0.79813516}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_R/scapula_R/arm_upper_R
+    localPosition: {x: 0.41000175, y: 0, z: 0}
+    localRotation: {x: 0, y: 0, z: 0.8144525, w: -0.5802303}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_R/scapula_R/arm_upper_R/arm_lower_R
+    localPosition: {x: 1.4800007, y: -0.00000019837171, z: 0}
+    localRotation: {x: 0, y: 0, z: -0.87602925, w: 0.48225808}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_R/scapula_R/arm_upper_R/arm_lower_R/hand_R
+    localPosition: {x: 1.0705304, y: 0.0000013113022, z: 0}
+    localRotation: {x: 0, y: 0, z: 0.7535466, w: -0.6573946}
+    localScale: {x: 1.25, y: 1.25, z: 1}
+  - path: body_lower/body_upper/shoulder_L
+    localPosition: {x: 0.7604886, y: -0.24001908, z: -0.15136719}
+    localRotation: {x: 0, y: 0, z: -0.61955976, w: 0.7849495}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_L/scapula_L
+    localPosition: {x: 0.7000002, y: -0.00000014901161, z: 0}
+    localRotation: {x: 0, y: 0, z: -0.6024769, w: 0.79813635}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_L/scapula_L/arm_upper_L
+    localPosition: {x: 0.41000256, y: 0, z: 0}
+    localRotation: {x: 0, y: 0, z: 0.60385686, w: 0.79709285}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_L/scapula_L/arm_upper_L/arm_lower_L
+    localPosition: {x: 1.3783877, y: -0.00000023841858, z: 0}
+    localRotation: {x: 0, y: 0, z: 0.6171757, w: 0.7868254}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/shoulder_L/scapula_L/arm_upper_L/arm_lower_L/hand_L
+    localPosition: {x: 1.5932956, y: -0.00000022351742, z: 0}
+    localRotation: {x: 0, y: 0, z: 0.9998333, w: -0.01825962}
+    localScale: {x: 1.25, y: 1.25, z: 1}
+  - path: body_lower/body_upper/neck
+    localPosition: {x: 0.80000126, y: 0, z: 0}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    localScale: {x: 1, y: 1, z: 1}
+  - path: body_lower/body_upper/neck/face
+    localPosition: {x: 0.5, y: 0, z: 0}
+    localRotation: {x: 0, y: 0, z: 0, w: 1}
+    localScale: {x: 1, y: 1, z: 1}

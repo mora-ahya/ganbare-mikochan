@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - mikochan
+  - enemy
+  - Ground
+  - Trap
+  - GashaHead
+  - ActiveTrigger
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Player
+  - Enemy
+  - Ground
+  - PlayerTrigger
+  - Kamisama
+  - Camera
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: KamisamaArea
+    uniqueID: 3661545133
+    locked: 0
+  - name: Enemy
+    uniqueID: 3465580881
+    locked: 0
+  - name: Player
+    uniqueID: 4289993393
+    locked: 0
+  - name: FrontView
+    uniqueID: 2150059479
+    locked: 0
+  - name: UI
+    uniqueID: 1840177451
+    locked: 0
