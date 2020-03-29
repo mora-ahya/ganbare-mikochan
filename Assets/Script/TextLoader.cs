@@ -25,7 +25,7 @@ public class TextLoader : MonoBehaviour
 
     public void LoadText(string s, List<string> l)
     {
-        ta = Resources.Load("Text/tutorial") as TextAsset;
+        ta = Resources.Load(s) as TextAsset;
         if (ta != null)
         {
             string[] tmp = ta.text.Split(dels);
@@ -45,7 +45,12 @@ public class TextLoader : MonoBehaviour
                     }
                 }
             }
-            sb.Clear();
+
+            if (sb.Length != 0)
+            {
+                l.Add(sb.ToString());
+                sb.Clear();
+            }
             ta = null;
         }
     }

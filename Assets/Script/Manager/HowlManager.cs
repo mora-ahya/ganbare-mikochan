@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class HowlManager : MonoBehaviour
 {
+    static HowlManager howlManagerInstance;
+    public static HowlManager Instance => howlManagerInstance;
+
     private Vector3 v = Vector3.zero;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        howlManagerInstance = this;
+        gameObject.SetActive(false);
     }
 
     // Update is called once per frame

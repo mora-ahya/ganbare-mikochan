@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class StageTransitionPoint : MonoBehaviour
 {
-    [SerializeField] private Vector2 destination;
-    [SerializeField] private GameObject stageDestination;
+    [SerializeField] Vector2 destination = default;
+    [SerializeField] GameObject stageDestination = default; //prefabをアタッチ
 
     void OnTriggerEnter2D(Collider2D collision)
     {

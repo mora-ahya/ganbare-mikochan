@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GashaHand : Enemy
 {
-    [SerializeField] CameraManager cm;
     [SerializeField] float waitTime;
     private WaitForSeconds wait;
 
@@ -17,7 +16,7 @@ public class GashaHand : Enemy
     {
         if (other.CompareTag("Ground"))
         {
-            if (!cm.GetShake)
+            if (!CameraManager.Instance.GetShake)
             {
                 StartCoroutine("Shake");
             }
@@ -27,8 +26,8 @@ public class GashaHand : Enemy
 
     IEnumerator Shake()
     {
-        cm.Shake(true);
+        CameraManager.Instance.Shake(true);
         yield return wait;
-        cm.Shake(false);
+        CameraManager.Instance.Shake(false);
     }
 }

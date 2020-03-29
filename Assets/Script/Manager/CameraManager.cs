@@ -4,26 +4,36 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    static CameraManager cameraManagerInstance;
+    public static CameraManager Instance => cameraManagerInstance;
+
     [SerializeField] float stageRight = 190;
     [SerializeField] float stageLeft = -7;
     float minDifY = -2.0f;
 
-    [SerializeField] GameObject backView; // 13f 6.3f
-    Vector2 bvDis = new Vector2(13f, 6.3f);
+    [SerializeField] GameObject postCamera;
+    [SerializeField] MyPostEffects mpe;
 
-    private Vector3 tmp = new Vector3(0, 0, -10);
-    private Vector2 dif = new Vector2(1.0f, 2.0f);
-    private bool fixation = false;
-    private bool shake;
-    private bool lookUnder;
-    private float d = 1;
-    private float value = 0;
-    private float fixedPos = 0;
+    Vector3 tmp = new Vector3(0, 0, -10);
+    Vector2 dif = new Vector2(1.0f, 2.0f);
+    Vector2 bvDis = new Vector2(13f, 6.3f);
+    GameObject backView; // 13f 6.3f
+    bool fixation = false;
+    bool shake;
+    bool lookUnder;
+    float d = 1;
+    float value = 0;
+    float fixedPos = 0;
 
 
     public bool GetShake => shake;
 
     public bool GetLook => lookUnder;
+
+    void Awake()
+    {
+        cameraManagerInstance = this;
+    }
 
     void ProcessShake()
     {
@@ -82,6 +92,8 @@ public class CameraManager : MonoBehaviour
         transform.position = tmp;
         if (backView != null)
             ProcessView();
+
+        postCamera.transform.position = transform.position;
     }
 
     public void Shake(bool value)
@@ -101,5 +113,10 @@ public class CameraManager : MonoBehaviour
         {
             fixedPos = transform.position.x;
         }
+    }
+
+    public void SetBackView(GameObject bv)
+    {
+        backView = bv;
     }
 }

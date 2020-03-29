@@ -7,11 +7,9 @@ public class Gashadokuro : Enemy
     private readonly int SHOT_COUNT = 4;
 
     [SerializeField] GashaShot[] gashaShots;
-    [SerializeField] GameObject miko;
     [SerializeField] BoxCollider2D handR;
     [SerializeField] BoxCollider2D handL;
     [SerializeField] Animator animator;
-    [SerializeField] HowlManager hm;
     [SerializeField] Transform mouseTrans;
     [SerializeField] CameraManager cm;
     [SerializeField] FirstBossEvent fbe;
@@ -49,6 +47,7 @@ public class Gashadokuro : Enemy
     void Start()
     {
         defaultPosX = transform.position.x;
+        cm = CameraManager.Instance;
         HandCollider(false);
     }
 
@@ -72,13 +71,13 @@ public class Gashadokuro : Enemy
                         cm.Shake(false);
                         StartCoroutine("Cooltime");
                     }
-                    else if (anim.IsName("laugh") && !hm.gameObject.activeSelf)
+                    else if (anim.IsName("laugh") && !HowlManager.Instance.gameObject.activeSelf)
                     {
                         if (!cm.GetShake)
                         {
                             cm.Shake(true);
                         }
-                        hm.Howl(mouseTrans.position, 0.5f);
+                        HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
                     }
                     else if (cm.GetShake && anim.IsName("appearance") && anim.normalizedTime > 1)
                     {
@@ -188,7 +187,7 @@ public class Gashadokuro : Enemy
 
     void Sprinkle() //腕の振り上げ
     {
-        float tmp = miko.transform.position.x - transform.position.x;
+        float tmp = Mikochan.Instance.transform.position.x - transform.position.x;
         if (tmp > 0)
         {
             animator.SetBool("LHand", true);

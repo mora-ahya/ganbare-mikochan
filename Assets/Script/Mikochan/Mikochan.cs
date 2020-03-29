@@ -20,7 +20,9 @@ public class Mikochan : MonoBehaviour
     [SerializeField] CameraManager cm;
     [SerializeField] GameSystem gs;
     [SerializeField] GameObject kamisama;
+    [SerializeField] MyPostEffects mpe;
 
+    readonly WaitForSeconds oneSecond = new WaitForSeconds(1f);
     readonly WaitForSeconds wait = new WaitForSeconds(0.08f);
     WaitForSeconds knockBackTime = new WaitForSeconds(0.3f);
     Vector2 tmp = new Vector2();
@@ -443,6 +445,13 @@ public class Mikochan : MonoBehaviour
                 break;
         }
     }
+    /*//テスト実装
+    public void TimeStop()
+    {
+        animator.SetBool("isCharge", true);
+        StartCoroutine(TimeStopCroutine());
+    }
+    */
 
     IEnumerator Inv()
     {
@@ -468,4 +477,13 @@ public class Mikochan : MonoBehaviour
         yield return knockBackTime;
         damaged = false;
     }
+    /*//テスト実装
+    IEnumerator TimeStopCroutine()
+    {
+        yield return oneSecond;
+        mpe.SetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT, true);
+        yield return oneSecond;
+        animator.SetBool("isCharge", false);
+
+    }*/
 }

@@ -6,19 +6,14 @@ using UnityEngine.UI;
 public class FirstBossEvent : MonoBehaviour
 {
     [SerializeField] GameObject gasha;
-    [SerializeField] GameObject miko;
-    [SerializeField] CameraManager cm;
     [SerializeField] BoxCollider2D bc;
-    [SerializeField] Image whiteness;
-    [SerializeField] Image darkness;
-    [SerializeField] GameSystem gs;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.CompareTag("mikochan"))
         {
             gasha.SetActive(true);
-            cm.FixedCamera(true);
+            CameraManager.Instance.FixedCamera(true);
             bc.enabled = false;
         }
     }
@@ -26,8 +21,8 @@ public class FirstBossEvent : MonoBehaviour
     public void BeatenBoss()
     {
         StartCoroutine("Beaten");
-        whiteness.gameObject.SetActive(true);
-        whiteness.CrossFadeAlpha(0, 0.2f, false);
+        GameSystem.Instance.Whiteness.gameObject.SetActive(true);
+        GameSystem.Instance.Whiteness.CrossFadeAlpha(0f, 0.2f, false);
     }
 
     IEnumerator Beaten()
@@ -36,6 +31,6 @@ public class FirstBossEvent : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         Time.timeScale = 1.0f;
         yield return new WaitForSeconds(4f);
-        gs.GameClear();
+        GameSystem.Instance.GameClear();
     }
 }

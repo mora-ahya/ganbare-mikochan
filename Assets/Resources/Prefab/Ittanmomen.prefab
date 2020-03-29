@@ -148,7 +148,6 @@ MonoBehaviour:
   hitArea: {fileID: 3912826563321203992}
   rb: {fileID: 3912826562836927554}
   stunS: {fileID: 21300006, guid: 24ae7faff57d54b4c8b6ac8e98b2fb90, type: 3}
-  sr: {fileID: 3912826562836927558}
 --- !u!58 &3912826562836927576
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -308,7 +307,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 30, y: 20}
+  m_Size: {x: 25, y: 20}
   m_EdgeRadius: 0
 --- !u!114 &3912826563962935603
 MonoBehaviour:

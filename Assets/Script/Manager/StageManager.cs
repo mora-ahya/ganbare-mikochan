@@ -8,13 +8,20 @@ public class StageManager : MonoBehaviour
 
     public static StageManager Instance => smInstance;
 
-    [SerializeField] private GameObject currentStage;
-    private GameObject preStage = null;
-    private GameObject tmp;
+    [SerializeField] GameObject currentStage = default;
+    GameObject preStage = null;
+    GameObject tmp;
 
     void Awake()
     {
         smInstance = this;
+    }
+
+    void Start()
+    {
+        if (currentStage != default)
+            currentStage.GetComponent<Stage>().Initialize();
+
     }
 
     public void Transition(GameObject nextStage)
@@ -25,25 +32,27 @@ public class StageManager : MonoBehaviour
             currentStage = Instantiate(nextStage);
             currentStage.name = nextStage.name;
             preStage.SetActive(false);
+            return;
         }
-        else if (preStage.name == nextStage.name)
+
+        if (preStage.name == nextStage.name)
         {
             tmp = currentStage;
             currentStage = preStage;
             preStage = tmp;
             preStage.SetActive(false);
             currentStage.SetActive(true);
-            currentStage.GetComponent<Stage>().Reset();
+            currentStage.GetComponent<Stage>().Initialize();
+            return;
         }
-        else
-        {
-            Destroy(preStage);
-            System.GC.Collect();
-            Resources.UnloadUnusedAssets();
-            preStage = currentStage;
-            currentStage = Instantiate(nextStage);
-            currentStage.name = nextStage.name;
-            preStage.SetActive(false);
-        }
+
+        Destroy(preStage);
+        System.GC.Collect();
+        Resources.UnloadUnusedAssets();
+        preStage = currentStage;
+        currentStage = Instantiate(nextStage);
+        currentStage.name = nextStage.name;
+        preStage.SetActive(false);
+
     }
 }

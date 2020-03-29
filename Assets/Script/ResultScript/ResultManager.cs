@@ -10,7 +10,6 @@ public class ResultManager : MonoBehaviour
     const string gameclear = "GAME CLEAR";
 
     [SerializeField] Text t;
-    [SerializeField] Text t2;
     [SerializeField] Image[] i;
     [SerializeField] Image darkness;
 
@@ -36,8 +35,6 @@ public class ResultManager : MonoBehaviour
         yield return wait;
         i[0].gameObject.SetActive(false);
         (GameSystem.gameOver ? i[1] : i[2]).gameObject.SetActive(true);
-        yield return wait;
-        t2.gameObject.SetActive(true);
         yield return wait;
         darkness.CrossFadeAlpha(1, 2.0f, true);
         yield return wait;

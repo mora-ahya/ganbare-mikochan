@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Stage : MonoBehaviour
 {
-    [SerializeField] private Enemy[] enemies;
+    [SerializeField] GameObject backview = default;
+    [SerializeField] Enemy[] enemies = default;
 
-    public void Reset()
+    public void Initialize()
     {
         foreach (Enemy enemy in enemies)
         {
@@ -16,6 +17,11 @@ public class Stage : MonoBehaviour
             {
                 enemy.gameObject.SetActive(false);
             }
+        }
+
+        if (backview != default)
+        {
+            CameraManager.Instance.SetBackView(backview);
         }
     }
 }

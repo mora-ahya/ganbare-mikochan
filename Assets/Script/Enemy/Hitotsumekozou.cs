@@ -13,7 +13,7 @@ public class Hitotsumekozou : Enemy
     [SerializeField] CapsuleCollider2D cc;
     [SerializeField] CapsuleCollider2D hitArea;
     [SerializeField] Rigidbody2D rb;
-    [SerializeField] Sprite stunS;
+    [SerializeField] Sprite stunSprite;
     readonly WaitForSeconds stunTime = new WaitForSeconds(5.0f);
     readonly WaitForSeconds coolTime = new WaitForSeconds(0.5f);
 
@@ -96,7 +96,7 @@ public class Hitotsumekozou : Enemy
                         rb.velocity = Vector3.zero;
                         stun = true;
                         ActiveStunEffect(true);
-                        sr.sprite = stunS;
+                        sr.sprite = stunSprite;
                         _animator.enabled = false;
                         StartCoroutine("Revivals");
                     }
@@ -137,7 +137,7 @@ public class Hitotsumekozou : Enemy
                     rb.velocity = Vector3.zero;
                     stun = true;
                     ActiveStunEffect(true);
-                    sr.sprite = stunS;
+                    sr.sprite = stunSprite;
                     _animator.enabled = false;
                     StartCoroutine("Revivals");
                 }
