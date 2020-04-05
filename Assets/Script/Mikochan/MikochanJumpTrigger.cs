@@ -8,34 +8,19 @@ public class MikochanJumpTrigger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        mikochan = transform.parent.GetComponent<Mikochan>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        mikochan = Mikochan.Instance;
     }
 
     void OnTriggerStay2D(Collider2D other)
     {
-        //Debug.Log(true);
-        if (other.gameObject.tag == "Ground")
-        {
-            if (!mikochan.IsGround)
-                mikochan.IsGround = true;
-        }
-        //Debug.Log(true);
+        if (other.gameObject.tag == "Ground" && !mikochan.IsGround)
+            mikochan.IsGround = true;
+
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log(true);
-        if (other.gameObject.tag == "Ground")
-        {
-            //rb.velocity = Vector2.zero;
-            if (!mikochan.IsGround)
-                mikochan.IsGround = true;
-        }
+        if (other.gameObject.tag == "Ground" && !mikochan.IsGround)
+            mikochan.IsGround = true;
     }
 }

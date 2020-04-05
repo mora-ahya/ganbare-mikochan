@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class GashaShot : Enemy
 {
-    [SerializeField] Transform gashaHead;//8.0f
-    [SerializeField] Gashadokuro gasha;
-    [SerializeField] CircleCollider2D cc;
-    [SerializeField] Rigidbody2D rb;
-    readonly WaitForSeconds stopTime = new WaitForSeconds(0.5f);
+    static readonly string TagNameGashaHead = "GashaHead";
+    static readonly string CoroutineNameStop = "Stop";
+
+    [SerializeField] Transform gashaHead = default;//8.0f
+    [SerializeField] Gashadokuro gasha = default;
+    [SerializeField] CircleCollider2D cc = default;
 
     float v = 1.0f;
     Mikochan miko;
+    Action act;
 
     // Start is called before the first frame update
     void Start()
@@ -24,36 +26,25 @@ public class GashaShot : Enemy
         transform.position = gashaHead.position;
         transform.rotation = Quaternion.identity;
         rb.velocity = Vector2.zero;
-        ResetM();
+        ResetMaterial();
         mhp = maxhp;
         Revival();
         stun = false;
+        act = DecideDir;
         v = sv;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!invincible)
-        {
-            if (inRange && Input.GetMouseButtonDown(0))
-            {
-                //Debug.Log(self.InRange);
-                if (cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
-                {
-                    MouseEvent();
-                }
-            }
-        }
-        if (!stun)
-        {
-            DecideDir();
-        }
-        else if (hp <= 0)
-        {
-            FlyAway();
-        }
-        //Debug.Log(gashaHead.position);
+        MouseEvent();
+        act?.Invoke();
+    }
+
+    public override void Act()
+    {
+        MouseEvent();
+        act?.Invoke();
     }
 
     void DecideDir()
@@ -64,24 +55,20 @@ public class GashaShot : Enemy
 
     void MouseEvent()
     {
-        //Debug.Log(self.InRange);
-        if (!GameSystem.stop)
-        {
-            if (!stun)
-            {
-                stun = true;
-                Damage(miko.KamiAttack);
-                rb.velocity *= -4;
-                //Debug.Log(self.HP);
-                StartCoroutine("DamageEffects");
-                if (hp > 0)
-                {
-                    StartCoroutine("Stop");
-                }
-                //rb.velocity *= -4;
+        if (stun || GameSystem.Instance.Stop || invincible || !inRange || !Input.GetMouseButtonDown(0) || !cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+            return;
 
-            }
+        stun = true;
+        Damage(miko.KamiAttack);
+        rb.velocity *= -4;
+        StartCoroutine(CoroutineNameDamageEffect);
+        if (hp > 0)
+        {
+            StartCoroutine(CoroutineNameStop);
+            act = null;
+            return;
         }
+        act = FlyAway;
     }
 
     void FlyAway()
@@ -94,31 +81,27 @@ public class GashaShot : Enemy
         transform.Rotate(0, 0, -20);
     }
 
-    private IEnumerator DamageEffects()
+    private IEnumerator DamageEffectCoroutine()
     {
         DamageEffect();
         yield return null;
-        ResetM();
+        ResetMaterial();
     }
 
     private IEnumerator Stop()
     {
-        yield return stopTime;
+        yield return GameSystem.Instance.HalfSecond;
         stun = false;
-
+        act = DecideDir;
     }
 
     void OnTriggerStay2D(Collider2D other)
     {
-        //Debug.Log(true);
-        if (other.gameObject.CompareTag("GashaHead"))
+        if (other.gameObject.CompareTag(TagNameGashaHead) && hp <= 0)
         {
-            //Debug.Log(true);
-            if (hp <= 0)
-            {
-                gasha.Damage();
-                gameObject.SetActive(false);
-            }
+            gasha.Damage();
+            act = null;
+            gameObject.SetActive(false);
         }
     }
 }

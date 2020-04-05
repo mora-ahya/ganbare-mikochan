@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class FirstBossEvent : MonoBehaviour
 {
-    [SerializeField] GameObject gasha;
-    [SerializeField] BoxCollider2D bc;
+    [SerializeField] GameObject gasha = default;
+    [SerializeField] BoxCollider2D bc = default;
 
     void OnTriggerEnter2D(Collider2D collision)
     {
@@ -30,7 +30,7 @@ public class FirstBossEvent : MonoBehaviour
         Time.timeScale = 0.1f;
         yield return new WaitForSeconds(0.2f);
         Time.timeScale = 1.0f;
-        yield return new WaitForSeconds(4f);
+        yield return GameSystem.Instance.FourSecond;
         GameSystem.Instance.GameClear();
     }
 }

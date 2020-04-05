@@ -5,8 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class VanishWall : MonoBehaviour
 {
-    [SerializeField] TilemapRenderer tr;
-    [SerializeField] CompositeCollider2D cc;
+    [SerializeField] TilemapRenderer tr = default;
+    [SerializeField] CompositeCollider2D cc = default;
 
     private void OnTriggerStay2D(Collider2D collision)
     {

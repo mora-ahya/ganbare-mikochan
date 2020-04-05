@@ -142,10 +142,10 @@ MonoBehaviour:
   eaa: {fileID: 61547529514569879}
   defaultPos: {fileID: 61547527816095354}
   stunEffect: {fileID: 8956481238230794186}
+  rb: {fileID: 61547528524585057}
   cc: {fileID: 61547528524585061}
   hitArea: {fileID: 61547529001658275}
   bc: {fileID: 61547528524585062}
-  rb: {fileID: 61547528524585057}
   s:
   - {fileID: 21300000, guid: fae28a910dd8eb540b9ea07c9f25299a, type: 3}
   - {fileID: 21300002, guid: fae28a910dd8eb540b9ea07c9f25299a, type: 3}
@@ -332,8 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b4c3ea26658404488d81c183cbb80b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  self: {fileID: 61547528524585057}
-  self2: {fileID: 61547528524585060}
+  self: {fileID: 61547528524585060}
 --- !u!1 &8956481238230794186
 GameObject:
   m_ObjectHideFlags: 0

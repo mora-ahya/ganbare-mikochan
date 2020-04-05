@@ -4,19 +4,29 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public static readonly string TagNameEnemy = "enemy";
+
+    protected delegate void Action();
+
+    protected static readonly string CoroutineNameRevival = "RevivalCoroutine";
+    protected static readonly string CoroutineNameDamageEffect = "DamageEffectCoroutine";
+
     [SerializeField] protected int mhp = 3;
     [SerializeField] protected int hp = 3;
     [SerializeField] protected int exp = 1;
     [SerializeField] protected int attack = 1;
     [SerializeField] protected bool invincible = false;
-    [SerializeField] protected Material damageEffect;
-    [SerializeField] protected Material outLine;
-    [SerializeField] protected Material defaultM;
-    [SerializeField] protected SpriteRenderer sr;
-    [SerializeField] protected Anima2D.SpriteMeshInstance smi;
-    [SerializeField] protected EnemyActiveArea eaa;
-    [SerializeField] protected Transform defaultPos;
-    [SerializeField] protected GameObject stunEffect;
+    [SerializeField] protected Material damageEffect = default;
+    [SerializeField] protected Material outLine = default;
+    [SerializeField] protected Material defaultM = default;
+    [SerializeField] protected SpriteRenderer sr = default;
+    [SerializeField] protected Anima2D.SpriteMeshInstance smi = default;
+    [SerializeField] protected EnemyActiveArea eaa = default;
+    [SerializeField] protected Transform defaultPos = default;
+    [SerializeField] protected GameObject stunEffect = default;
+    [SerializeField] protected Rigidbody2D rb = default;
+
+    Vector2 storedVelocity;
 
     protected bool stun = false;
     protected bool inRange = false;
@@ -71,6 +81,11 @@ public class Enemy : MonoBehaviour
 
     }
 
+    public virtual void Act()
+    {
+
+    }
+
     public void Damage(int amount)
     {
         hp -= amount;
@@ -86,8 +101,10 @@ public class Enemy : MonoBehaviour
         if (sr != null)
         {
             sr.material = damageEffect;
+            return;
         }
-        else if (smi != null)
+
+        if (smi != null)
         {
             smi.sharedMaterial = damageEffect;
         }
@@ -98,30 +115,89 @@ public class Enemy : MonoBehaviour
         if (sr != null)
         {
             sr.material = outLine;
+            return;
         }
-        else if (smi != null)
+
+        if (smi != null)
         {
             smi.sharedMaterial = outLine;
         }
     }
 
-    public void ResetM()
+    public void ResetMaterial()
     {
         if (InRange)
         {
             OutLine();
+            return;
         }
-        else
+
+        if (sr != null)
         {
-            if (sr != null)
+            sr.material = defaultM;
+            return;
+        }
+
+        if (smi != null)
+        {
+            smi.sharedMaterial = defaultM;
+        }
+    }
+
+    public bool CurrentMaterialIsDamageEffect()
+    {
+        if (sr != null)
+        {
+            if (sr.material == damageEffect)
             {
-                sr.material = defaultM;
-            }
-            else if (smi != null)
-            {
-                smi.sharedMaterial = defaultM;
+                Debug.Log(true);
+                return true;
             }
         }
+
+        if (smi != null)
+        {
+            if (smi.sharedMaterial == damageEffect)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public virtual void Pause()
+    {
+        if (rb != null)
+        {
+            StorePhysic();
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+    }
+
+    public virtual void Restart()
+    {
+        if (rb != null)
+        {
+            RestorePhysic();
+            rb.bodyType = RigidbodyType2D.Dynamic;
+        }
+    }
+
+    public virtual void StorePhysic()
+    {
+        if (rb != null)
+        {
+            storedVelocity = rb.velocity;
+            //rb.velocity = Vector2.zero;
+        }
+    }
+
+    public virtual void RestorePhysic()
+    {
+        if (rb != null)
+            rb.velocity = storedVelocity;
+
+        storedVelocity = Vector2.zero;
     }
 
     public void SetActiveAreaPosition()

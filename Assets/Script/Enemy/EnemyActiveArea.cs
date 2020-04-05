@@ -6,10 +6,7 @@ public class EnemyActiveArea : MonoBehaviour
 {
     const string targetTag = "mikochan";
 
-    [SerializeField] Rigidbody2D self;
-    [SerializeField] Enemy self2;
-
-    Vector3 v;
+    [SerializeField] Enemy self = default;
 
     void OnTriggerEnter2D(Collider2D collision)
     {
@@ -18,7 +15,7 @@ public class EnemyActiveArea : MonoBehaviour
             if (!self.gameObject.activeSelf)
             {
                 self.gameObject.SetActive(true);
-                self.velocity = v;
+                self.RestorePhysic();
             }
         }
     }
@@ -29,14 +26,13 @@ public class EnemyActiveArea : MonoBehaviour
         {
             if (self.gameObject.activeSelf)
             {
-                if (self2.Stun)
+                if (self.Stun)
                 {
-                    self2.ResetFlag = true;
-                    v = Vector3.zero;
+                    self.ResetFlag = true;
                 }
                 else
                 {
-                    v = self.velocity;
+                    self.StorePhysic();
                 }
                 self.gameObject.SetActive(false);
             }

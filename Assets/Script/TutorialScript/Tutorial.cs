@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Tutorial : MonoBehaviour
 {
-    [SerializeField] BoxCollider2D bc;
-    [SerializeField] CapsuleCollider2D cc;
+    [SerializeField] BoxCollider2D bc = default;
+    [SerializeField] CapsuleCollider2D cc = default;
     private readonly string textName = "Text/tutorial";
 
     private List<string> tutorialText = new List<string>();

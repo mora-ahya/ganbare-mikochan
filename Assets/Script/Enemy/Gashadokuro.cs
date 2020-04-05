@@ -4,31 +4,48 @@ using UnityEngine;
 
 public class Gashadokuro : Enemy
 {
-    private readonly int SHOT_COUNT = 4;
+    readonly string animNameCooltime = "cooltime";
+    readonly string animNameLaugh = "laugh";
+    readonly string animNameAppearance = "appearance";
+    readonly string animNameHottime = "hottime";
+    readonly string animNameBroken = "broken";
+    readonly string animNameOpen = "Open";
+    readonly string animBoolOpenMouse = "OpenMouse";
+    readonly string animBoolRecovery = "Recovery";
+    readonly string animBoolLHand = "LHand";
+    readonly string animBoolRHand = "RHand";
+    readonly string animBoolUseFirst = "useFirst";
+    readonly string animBoolUseSecond = "useSecond";
+    readonly string animBoolDamaged = "Damaged";
+    readonly string animBoolBeaten = "Beaten";
+    readonly string animFloatMultiplier = "Multiplier";
 
-    [SerializeField] GashaShot[] gashaShots;
-    [SerializeField] BoxCollider2D handR;
-    [SerializeField] BoxCollider2D handL;
-    [SerializeField] Animator animator;
-    [SerializeField] Transform mouseTrans;
-    [SerializeField] CameraManager cm;
-    [SerializeField] FirstBossEvent fbe;
-    private float defaultPosX;
-    private WaitForSeconds wait = new WaitForSeconds(2f);//ダメージごとに短く
-    private readonly WaitForSeconds wait2 = new WaitForSeconds(3f);
-    private AnimatorStateInfo anim;
-    private int swingCount = 0;
-    private int shotInterval = 2;
-    private float amountX = 0;
-    private float shotV = 1.0f;
-    private int shotHP = 3;
-    private readonly float speed = 0.2f;
-    private readonly float handBoundary = 4.0f; //がしゃが降り下ろしの1と2のどちらを使うかその境界値
-    private readonly float firstHandDis = 5.5f; //振り下ろし1の手の位置とがしゃ本体の位置の距離
-    private readonly float secondHandDis = 2.5f; //振り下ろし2の手の位置とがしゃ本体の位置の距離
-    private float d;
-    private bool move = false;
-    private bool runCoroutine = false;
+
+    [SerializeField] GashaShot[] gashaShots = default;
+    [SerializeField] BoxCollider2D handR = default;
+    [SerializeField] BoxCollider2D handL = default;
+    [SerializeField] Animator animator = default;
+    [SerializeField] Transform mouseTrans = default;
+    [SerializeField] CameraManager cm = default;
+    [SerializeField] FirstBossEvent fbe = default;
+    WaitForSeconds wait = new WaitForSeconds(2f);//ダメージごとに短く
+    AnimatorStateInfo anim;
+    Action act;
+    int swingCount = 0;
+    int shotInterval = 2;
+    int shotHP = 3;
+    readonly int shotCount = 4;
+    float amountX = 0;
+    float shotV = 1.0f;
+    float d;
+    float defaultPosX;
+    readonly float speed = 0.2f;
+    readonly float handBoundary = 4.0f; //がしゃが降り下ろしの1と2のどちらを使うかその境界値
+    readonly float firstHandDis = 5.5f; //振り下ろし1の手の位置とがしゃ本体の位置の距離
+    readonly float secondHandDis = 2.5f; //振り下ろし2の手の位置とがしゃ本体の位置の距離
+    bool move = false;
+    bool runCoroutine = false;
+    /*
     State state = State.Appearance;
 
     enum State
@@ -41,7 +58,7 @@ public class Gashadokuro : Enemy
         Stun,
         Recovery,
         Beaten
-    }
+    }*/
 
     // Start is called before the first frame update
     void Start()
@@ -49,140 +66,314 @@ public class Gashadokuro : Enemy
         defaultPosX = transform.position.x;
         cm = CameraManager.Instance;
         HandCollider(false);
+        wait = GameSystem.Instance.TwoSecond;
+        act = AppearanceProcess;
     }
 
     // Update is called once per frame
     void Update()
     {
-        switch (state)
-        {
-            case State.Appearance: //登場シーン
-                if (!runCoroutine)
-                {
-                    if (!cm.GetShake)
-                    {
-                        cm.Shake(true);
-                    }
-                    anim = animator.GetCurrentAnimatorStateInfo(0);
-                    if (anim.IsName("cooltime"))
-                    {
-                        HandCollider(true);
-                        runCoroutine = true;
-                        cm.Shake(false);
-                        StartCoroutine("Cooltime");
-                    }
-                    else if (anim.IsName("laugh") && !HowlManager.Instance.gameObject.activeSelf)
-                    {
-                        if (!cm.GetShake)
-                        {
-                            cm.Shake(true);
-                        }
-                        HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
-                    }
-                    else if (cm.GetShake && anim.IsName("appearance") && anim.normalizedTime > 1)
-                    {
-                        cm.Shake(false);
-                    }
-                }
-                break;
+        //switch (state)
+        //{
+        //    case State.Appearance: //登場シーン
+        //        if (!runCoroutine)
+        //        {
+        //            if (!cm.GetShake)
+        //            {
+        //                cm.Shake(true);
+        //            }
+        //            anim = animator.GetCurrentAnimatorStateInfo(0);
+        //            if (anim.IsName(animNameCooltime))
+        //            {
+        //                HandCollider(true);
+        //                runCoroutine = true;
+        //                cm.Shake(false);
+        //                StartCoroutine(Cooltime());
+        //            }
+        //            else if (anim.IsName(animNameLaugh) && !HowlManager.Instance.gameObject.activeSelf)
+        //            {
+        //                if (!cm.GetShake)
+        //                {
+        //                    cm.Shake(true);
+        //                }
+        //                HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
+        //            }
+        //            else if (cm.GetShake && anim.IsName(animNameAppearance) && anim.normalizedTime > 1)
+        //            {
+        //                cm.Shake(false);
+        //            }
+        //        }
+        //        break;
 
-            case State.Sprinkle: //腕の振り上げ
-                Sprinkle();
-                state = State.Swing;
-                break;
+        //    case State.Sprinkle: //腕の振り上げ
+        //        Sprinkle();
+        //        state = State.Swing;
+        //        break;
 
-            case State.Swing: //腕の振り下げs
-                if (!runCoroutine)
-                {
-                    anim = animator.GetCurrentAnimatorStateInfo(0);
-                    if (anim.IsName("cooltime"))
-                    {
-                        swingCount++;
-                        if (!CheckShots() && swingCount == shotInterval)
-                        {
-                            animator.SetBool("OpenMouse", true);
-                        }
-                        ResetHandBool();
-                        ResetSwingBool();
-                        runCoroutine = true;
-                        StartCoroutine("Cooltime");
-                    }
-                }
-                break;
+        //    case State.Swing: //腕の振り下げs
+        //        if (!runCoroutine)
+        //        {
+        //            anim = animator.GetCurrentAnimatorStateInfo(0);
+        //            if (anim.IsName(animNameCooltime))
+        //            {
+        //                swingCount++;
+        //                if (!CheckShots() && swingCount == shotInterval)
+        //                {
+        //                    animator.SetBool(animBoolOpenMouse, true);
+        //                }
+        //                ResetHandBool();
+        //                ResetSwingBool();
+        //                runCoroutine = true;
+        //                StartCoroutine(Cooltime());
+        //            }
+        //        }
+        //        break;
 
-            case State.Return: //ダメージを与えられ真ん中に戻る
-                anim = animator.GetCurrentAnimatorStateInfo(0);
-                if (anim.IsName("hottime"))
-                {
-                    if (hp > 0)
-                    {
-                        ReturnDefaultPos();
-                        state = State.RowAway;
-                        swingCount = 0;
-                    }
-                    else
-                    {
+        //    case State.Return: //ダメージを与えられ真ん中に戻る
+        //        anim = animator.GetCurrentAnimatorStateInfo(0);
+        //        if (anim.IsName(animNameHottime))
+        //        {
+        //            if (hp > 0)
+        //            {
+        //                ReturnDefaultPos();
+        //                state = State.RowAway;
+        //                swingCount = 0;
+        //            }
+        //            else
+        //            {
 
-                    }
-                }
-                break;
+        //            }
+        //        }
+        //        break;
 
-            case State.RowAway: //薙ぎ払い
-                if (!move && !runCoroutine)
-                {
-                    runCoroutine = true;
-                    StartCoroutine("Hottime");
-                }
-                break;
+        //    case State.RowAway: //薙ぎ払い
+        //        if (!move && !runCoroutine)
+        //        {
+        //            runCoroutine = true;
+        //            StartCoroutine(Hottime());
+        //        }
+        //        break;
 
-            case State.Stun: //気絶状態
-                if (handL.enabled)
-                {
-                    anim = animator.GetCurrentAnimatorStateInfo(0);
-                    if (anim.IsName("broken"))
-                    {
-                        HandCollider(false);
-                    }
-                }
-                else if (swingCount == SHOT_COUNT)
-                {
-                    state = State.Recovery;
-                }
-                else if (!runCoroutine)
-                {
-                    runCoroutine = true;
-                    StartCoroutine("ShotInterval");
-                }
-                break;
+        //    case State.Stun: //気絶状態
+        //        if (handL.enabled)
+        //        {
+        //            anim = animator.GetCurrentAnimatorStateInfo(0);
+        //            if (anim.IsName(animNameBroken))
+        //            {
+        //                HandCollider(false);
+        //            }
+        //        }
+        //        else if (swingCount == shotCount)
+        //        {
+        //            state = State.Recovery;
+        //        }
+        //        else if (!runCoroutine)
+        //        {
+        //            runCoroutine = true;
+        //            StartCoroutine(ShotInterval());
+        //        }
+        //        break;
 
-            case State.Recovery: //気絶から復帰
-                if (!runCoroutine)
-                {
-                    if (animator.GetBool("Recovery"))
-                    {
-                        anim = animator.GetCurrentAnimatorStateInfo(0);
-                        if (anim.IsName("cooltime"))
-                        {
-                            ResetHandBool();
-                            ResetSwingBool();
-                            Upgrade();
-                            HandCollider(true);
-                            swingCount = 0;
-                            state = State.Sprinkle;
-                        }
-                    }
-                    else
-                    {
-                        if (!CheckShots())
-                        {
-                            animator.SetBool("Recovery", true);
-                        }
-                    }
-                }
-                break;
-        }
+        //    case State.Recovery: //気絶から復帰
+        //        if (!runCoroutine)
+        //        {
+        //            if (animator.GetBool(animBoolRecovery))
+        //            {
+        //                anim = animator.GetCurrentAnimatorStateInfo(0);
+        //                if (anim.IsName(animNameCooltime))
+        //                {
+        //                    ResetHandBool();
+        //                    ResetSwingBool();
+        //                    Upgrade();
+        //                    HandCollider(true);
+        //                    swingCount = 0;
+        //                    state = State.Sprinkle;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (!CheckShots())
+        //                {
+        //                    animator.SetBool(animBoolRecovery, true);
+        //                }
+        //            }
+        //        }
+        //        break;
+        //}
+        Process();
         Move();
         MakeShot();
+    }
+
+    void Process()
+    {
+        act?.Invoke();
+    }
+
+    void AppearanceProcess()
+    {
+        if (runCoroutine)
+            return;
+
+        if (!cm.GetShake)
+            cm.Shake(true);
+        
+
+        anim = animator.GetCurrentAnimatorStateInfo(0);
+        if (anim.IsName(animNameCooltime))
+        {
+            HandCollider(true);
+            runCoroutine = true;
+            cm.Shake(false);
+            StartCoroutine(Cooltime());
+            return;
+        }
+
+        if (anim.IsName(animNameLaugh) && !HowlManager.Instance.gameObject.activeSelf)
+        {
+            if (!cm.GetShake)
+            {
+                cm.Shake(true);
+            }
+            HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
+            return;
+        }
+
+        if (cm.GetShake && anim.IsName(animNameAppearance) && anim.normalizedTime > 1)
+            cm.Shake(false);
+    }
+
+    void SprinkleProcess()
+    {
+        float tmp = Mikochan.Instance.transform.position.x - transform.position.x;
+        if (tmp > 0)
+        {
+            animator.SetBool(animBoolLHand, true);
+            d = 1;
+            //左手
+        }
+        else
+        {
+            animator.SetBool(animBoolRHand, true);
+            d = -1;
+            //右手
+        }
+
+        tmp = Mathf.Abs(tmp);
+        amountX = tmp - handBoundary;
+        if (amountX < 0)
+        {
+            animator.SetBool(animBoolUseSecond, true);
+            amountX = tmp - secondHandDis;
+            //振り下ろし2を使用し、sHDとmikoの距離を測る
+        }
+        else
+        {
+            animator.SetBool(animBoolUseFirst, true);
+            amountX = tmp - firstHandDis;
+            //振り下ろし1を使用し、fHDとmikoの距離を測る
+        }
+
+        tmp = Mathf.Abs(amountX);
+        if (tmp != 0)
+        {
+            d *= amountX / tmp;
+        }
+        amountX = tmp;
+        move = true;
+        //state = State.Swing;
+        act = SwingProcess;
+    }
+
+    void SwingProcess()
+    {
+        if (runCoroutine)
+            return;
+
+        anim = animator.GetCurrentAnimatorStateInfo(0);
+        if (!anim.IsName(animNameCooltime))
+            return;
+
+        swingCount++;
+
+        if (!CheckShots() && swingCount == shotInterval)
+            animator.SetBool(animBoolOpenMouse, true);
+
+        ResetHandBool();
+        ResetSwingBool();
+        runCoroutine = true;
+        StartCoroutine(Cooltime());
+    }
+
+    void ReturnProcess()
+    {
+        anim = animator.GetCurrentAnimatorStateInfo(0);
+        if (!anim.IsName(animNameHottime) || hp <= 0)
+            return;
+
+        ReturnDefaultPos();
+        //state = State.RowAway;
+        act = RowAwayProcess;
+        swingCount = 0;
+    }
+
+    void RowAwayProcess()
+    {
+        if (move || runCoroutine)
+            return;
+
+        runCoroutine = true;
+        StartCoroutine(Hottime());
+    }
+
+    void StunProcess()
+    {
+        if (handL.enabled)
+        {
+            anim = animator.GetCurrentAnimatorStateInfo(0);
+            if (anim.IsName(animNameBroken))
+                HandCollider(false);
+            
+            return;
+        }
+
+        if (swingCount == shotCount)
+        {
+            //state = State.Recovery;
+            act = RecoveryProcess;
+            return;
+        }
+
+        if (!runCoroutine)
+        {
+            runCoroutine = true;
+            StartCoroutine(ShotInterval());
+        }
+    }
+
+    void RecoveryProcess()
+    {
+        if (runCoroutine)
+            return;
+
+        if (animator.GetBool(animBoolRecovery))
+        {
+            anim = animator.GetCurrentAnimatorStateInfo(0);
+            if (anim.IsName(animNameCooltime))
+            {
+                ResetHandBool();
+                ResetSwingBool();
+                Upgrade();
+                HandCollider(true);
+                swingCount = 0;
+                //state = State.Sprinkle;
+                act = SprinkleProcess;
+            }
+            return;
+        }
+
+        if (!CheckShots())
+            animator.SetBool(animBoolRecovery, true);
     }
 
     void Sprinkle() //腕の振り上げ
@@ -190,13 +381,13 @@ public class Gashadokuro : Enemy
         float tmp = Mikochan.Instance.transform.position.x - transform.position.x;
         if (tmp > 0)
         {
-            animator.SetBool("LHand", true);
+            animator.SetBool(animBoolLHand, true);
             d = 1;
             //左手
         }
         else
         {
-            animator.SetBool("RHand", true);
+            animator.SetBool(animBoolRHand, true);
             d = -1;
             //右手
         }
@@ -204,13 +395,13 @@ public class Gashadokuro : Enemy
         amountX = tmp - handBoundary;
         if (amountX < 0)
         {
-            animator.SetBool("useSecond", true);
+            animator.SetBool(animBoolUseSecond, true);
             amountX = tmp - secondHandDis;
             //振り下ろし2を使用し、sHDとmikoの距離を測る
         }
         else
         {
-            animator.SetBool("useFirst", true);
+            animator.SetBool(animBoolUseFirst, true);
             amountX = tmp - firstHandDis;
             //振り下ろし1を使用し、fHDとmikoの距離を測る
         }
@@ -224,42 +415,45 @@ public class Gashadokuro : Enemy
 
     void Move()
     {
-        if (move)
+        if (!move)
+            return;
+
+        if (amountX >= speed)
         {
-            if (amountX >= speed)
-            {
-                transform.position += new Vector3(d * speed, 0, 0);
-                amountX -= speed;
-            }
-            else
-            {
-                transform.position += new Vector3(d * amountX, 0, 0);
-                move = false;
-            }
+            transform.position += Vector3.right * d * speed;
+            amountX -= speed;
+            return;
         }
+
+        transform.position += Vector3.right * d * amountX;
+        move = false;
     }
 
     void ResetHandBool() //振り上げアニメーションのリセット
     {
-        if (animator.GetBool("LHand"))
+        if (animator.GetBool(animBoolLHand))
         {
-            animator.SetBool("LHand", false);
+            animator.SetBool(animBoolLHand, false);
+            return;
         }
-        else if (animator.GetBool("RHand"))
+
+        if (animator.GetBool(animBoolRHand))
         {
-            animator.SetBool("RHand", false);
+            animator.SetBool(animBoolRHand, false);
         }
     }
 
     void ResetSwingBool() //振り下げアニメーションのリセット
     {
-        if (animator.GetBool("useFirst"))
+        if (animator.GetBool(animBoolUseFirst))
         {
-            animator.SetBool("useFirst", false);
+            animator.SetBool(animBoolUseFirst, false);
+            return;
         }
-        else if (animator.GetBool("useSecond"))
+
+        if (animator.GetBool(animBoolUseSecond))
         {
-            animator.SetBool("useSecond", false);
+            animator.SetBool(animBoolUseSecond, false);
         }
     }
 
@@ -282,21 +476,21 @@ public class Gashadokuro : Enemy
 
     void MakeShot() //がしゃショットの有効化
     {
-        if (animator.GetBool("OpenMouse"))
+        if (!animator.GetBool(animBoolOpenMouse))
+            return;
+
+        anim = animator.GetCurrentAnimatorStateInfo(1);
+        if (!anim.IsName(animNameOpen) || anim.normalizedTime < 1)
+            return;
+
+        foreach (GashaShot gashaShot in gashaShots)
         {
-            anim = animator.GetCurrentAnimatorStateInfo(1);
-            if (anim.IsName("Open") && anim.normalizedTime >= 1)
+            if (!gashaShot.gameObject.activeSelf)
             {
-                foreach (GashaShot gashaShot in gashaShots)
-                {
-                    if (!gashaShot.gameObject.activeSelf)
-                    {
-                        gashaShot.gameObject.SetActive(true);
-                        gashaShot.Set(shotV, shotHP);
-                        animator.SetBool("OpenMouse", false);
-                        break;
-                    }
-                }
+                gashaShot.gameObject.SetActive(true);
+                gashaShot.Set(shotV, shotHP);
+                animator.SetBool(animBoolOpenMouse, false);
+                return;
             }
         }
     }
@@ -319,49 +513,59 @@ public class Gashadokuro : Enemy
         if (hp <= 1)
         {
             wait = new WaitForSeconds(0.1f);
-            animator.SetFloat("Multiplier", 2.0f);
+            animator.SetFloat(animFloatMultiplier, 2.0f);
             shotInterval = 8;
             shotV = 3.0f;
             shotHP = 10;
+            return;
         }
-        else if (hp <= 6)
+
+        if (hp <= 6)
         {
             wait = new WaitForSeconds(0.3f);
-            animator.SetFloat("Multiplier", 1.5f);
+            animator.SetFloat(animFloatMultiplier, 1.5f);
             shotInterval = 6;
             shotV = 2.0f;
-        } else if (hp <= 11)
+            return;
+        }
+
+        if (hp <= 11)
         {
-            wait = new WaitForSeconds(1.0f);
-            animator.SetFloat("Multiplier", 1.0f);
+            wait = GameSystem.Instance.OneSecond;
+            animator.SetFloat(animFloatMultiplier, 1.0f);
             shotInterval = 4;
+            return;
         }
     }
 
     private IEnumerator Cooltime() //腕を振り下ろした後の待機時間
     {
         yield return wait;
-        if (animator.GetBool("Damaged"))
-        {
-            state = State.Return;
-        }
-        else if (animator.GetBool("Beaten"))
-        {
-            state = State.Beaten;
-        }
-        else
-        {
-            state = State.Sprinkle;
-        }
         runCoroutine = false;
+        if (animator.GetBool(animBoolDamaged))
+        {
+            //state = State.Return;
+            act = ReturnProcess;
+            yield break;
+        }
+        if (animator.GetBool(animBoolBeaten))
+        {
+            //state = State.Beaten;
+            act = null;
+            yield break;
+        }
+        //state = State.Sprinkle;
+        act = SprinkleProcess;
+
     }
 
     private IEnumerator Hottime() //ダメージを食らって薙ぎ払うまでの待機時間
     {
-        yield return wait2;
-        animator.SetBool("Damaged", false);
-        animator.SetBool("Recovery", false);
-        state = State.Stun;
+        yield return GameSystem.Instance.ThreeSecond;
+        animator.SetBool(animBoolDamaged, false);
+        animator.SetBool(animBoolRecovery, false);
+        //state = State.Stun;
+        act = StunProcess;
         runCoroutine = false;
     }
 
@@ -369,13 +573,15 @@ public class Gashadokuro : Enemy
     {
         DamageEffect();
         yield return null;
-        ResetM();
+        yield return null;
+        yield return null;
+        ResetMaterial();
     }
 
     private IEnumerator ShotInterval() //ショットの間隔
     {
-        yield return wait2;
-        animator.SetBool("OpenMouse", true);
+        yield return GameSystem.Instance.ThreeSecond;
+        animator.SetBool(animBoolOpenMouse, true);
         swingCount++;
         runCoroutine = false;
     }
@@ -383,19 +589,18 @@ public class Gashadokuro : Enemy
     public void Damage() //ダメージを受けたときの処理
     {
         Damage(1);
-        StartCoroutine("DamageEffects");
-        if (state != State.Stun && state != State.Recovery)
+        StartCoroutine(DamageEffects());
+        if (act == StunProcess || act == RecoveryProcess)
+            return;
+
+        if (hp <= 0)
         {
-            if (hp <= 0)
-            {
-                animator.SetBool("Beaten", true);
-                HandCollider(false);
-                fbe.BeatenBoss();
-            }
-            else
-            {
-                animator.SetBool("Damaged", true);
-            }
+            animator.SetBool(animBoolBeaten, true);
+            HandCollider(false);
+            fbe.BeatenBoss();
+            return;
         }
+
+        animator.SetBool(animBoolDamaged, true);
     }
 }

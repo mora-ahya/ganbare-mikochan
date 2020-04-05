@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class EnemyTrigger : MonoBehaviour
 {
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] SpriteRenderer sr;
+    [SerializeField] Rigidbody2D rb = default;
+    [SerializeField] SpriteRenderer sr = default;
     // Start is called before the first frame update
     void Start()
     {

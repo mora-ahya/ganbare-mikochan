@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 public class PostEffect : MonoBehaviour
 {
     [SerializeField]
-    protected Shader shader;
+    protected Shader shader = default;
     protected Material material;
     protected CommandBuffer cb;
     protected bool isActive;
@@ -26,12 +26,12 @@ public class PostEffect : MonoBehaviour
         }
     }
 
-    virtual public void Run()
+    public virtual void Run()
     {
 
     }
 
-    virtual public void Clear()
+    public virtual void Clear()
     {
 
     }

@@ -4,40 +4,34 @@ using UnityEngine;
 
 public class Karakasa : Enemy
 {
-    static readonly float JUMP_POWER = 5.0f;
-    static readonly float JUMP_POWER2 = 15.0f;
-    static readonly float JUMP_POWER_X = 1.0f;
-    static readonly float FLOATING_POWER = 10.0f;
-    static readonly float BOXCOLLIDER_OFFSETY = -0.195f;
-    static readonly Vector2 COLLIDER_OFFSET = new Vector2(-0.02f, -0.04f);
+    static readonly float JumpPower = 5.0f;
+    static readonly float HighJumpPower = 15.0f;
+    static readonly float JumpPowerX = 1.0f;
+    static readonly float FloatingPower = 10.0f;
+    static readonly float BoxColliderOffsetY = -0.195f;
+    static readonly Vector2 ColliderOffset = new Vector2(-0.02f, -0.04f);
+    static readonly int JumpSprite = 0;
+    static readonly int SquatSprite = 1;
+    static readonly int GlideSprite = 2;
+    static readonly int StunSprite = 3;
 
-    [SerializeField] CapsuleCollider2D cc;
-    [SerializeField] CapsuleCollider2D hitArea;
-    [SerializeField] BoxCollider2D bc;
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] Sprite[] s;
-    readonly WaitForSeconds stunTime = new WaitForSeconds(5.0f);
-    readonly WaitForSeconds squatTime = new WaitForSeconds(0.5f);
+    [SerializeField] CapsuleCollider2D cc = default;
+    [SerializeField] CapsuleCollider2D hitArea = default;
+    [SerializeField] BoxCollider2D bc = default;
+    [SerializeField] Sprite[] s = default;
 
-    private Vector2 jumpPower = new Vector2();
-    private bool damaged;
-    private int count = 1;
-    private State state = State.Squat;
-    Vector3 tmp = new Vector3();
+    bool damaged;
+    int jumpCount = 1;
+    int counter;
+    Vector2 tmp = new Vector2();
+    Vector2 jumpPower = new Vector2();
     Mikochan miko;
-
-    enum State
-    {
-        Jumping,
-        Squat,
-        Glide,
-        Stun,
-        Awake
-    }
+    Action act;
 
     void Start()
     {
         miko = Mikochan.Instance;
+        //act = new Action(SquatProcess);
     }
 
     // Start is called before the first frame update
@@ -46,50 +40,142 @@ public class Karakasa : Enemy
         stun = false;
         inRange = false;
         Revival();
-        sr.sprite = s[(int)State.Squat];
-        state = State.Squat;
-        count = 1;
-        ResetM();
+        sr.sprite = s[SquatSprite];
+        act = SquatingProcess;
+        counter = 0;
+        jumpCount = 1;
+        ResetMaterial();
         ActiveStunEffect(false);
     }
-
-    // Update is called once per frame
-    void FixedUpdate()
+    
+    public override void Act()
     {
         if (resetFlag)
         {
             Set();
             resetFlag = false;
         }
+
         if (!stun)
         {
             MouseEvent();
-            Move();
+            act?.Invoke();
         }
+        hitArea.transform.position = transform.position;
         SetActiveAreaPosition();
+        //CurrentMaterialIsDamageEffect();
         //Debug.Log(isGround);
+    }
+
+    void SquatingProcess()
+    {
+        if (counter == 30)
+        {
+            counter = 0;
+            if (damaged)
+            {
+                damaged = false;
+            }
+
+            //Jump
+            if (miko.transform.position.x < transform.position.x)
+            {
+                jumpPower.x = -JumpPowerX;
+                if (sr.flipX)
+                {
+                    sr.flipX = false;
+                    ColliderFlip(false);
+                }
+            }
+            else
+            {
+                jumpPower.x = JumpPowerX;
+                if (!sr.flipX)
+                {
+                    sr.flipX = true;
+                    ColliderFlip(true);
+                }
+            }
+            sr.sprite = s[JumpSprite];
+            act = JumpingProcess;
+            jumpPower.y = jumpCount == 2 ? HighJumpPower : JumpPower;
+            rb.AddForce(jumpPower, ForceMode2D.Impulse);
+            jumpCount = (jumpCount + 1) % 3;
+            return;
+        }
+        counter++;
+    }
+
+    void JumpingProcess()
+    {
+        if (rb.velocity.y < 0 && jumpCount == 0)
+        {
+            act = GlidingProcess;
+            sr.sprite = s[GlideSprite];
+        }
+    }
+
+    void GlidingProcess()
+    {
+        if (!damaged)
+        {
+            rb.AddForce(Vector2.down * FloatingPower * rb.velocity.y);
+            if (miko.transform.position.x < transform.position.x)
+            {
+                rb.AddForce((rb.velocity.x < 0 ? HighJumpPower / 5 : HighJumpPower) * Vector2.left);
+                if (sr.flipX)
+                {
+                    sr.flipX = false;
+                    ColliderFlip(false);
+                }
+            }
+            else
+            {
+                //Pause();
+                rb.AddForce((rb.velocity.x > 0 ? HighJumpPower / 5 : HighJumpPower) * Vector2.right);
+                if (!sr.flipX)
+                {
+                    sr.flipX = true;
+                    ColliderFlip(true);
+                }
+            }
+        }
+    }
+
+    void SlidingProcess()
+    {
+        if (counter == 20)
+        {
+            act = SquatingProcess;
+            counter = 0;
+            rb.velocity = Vector2.zero;
+            return;
+        }
+        rb.velocity *= 0.9f;
+        counter++;
     }
 
     void MouseEvent()
     {
         if (!invincible && inRange && Input.GetMouseButtonDown(0))
         {
-            //Debug.Log(self.InRange);
             if (hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
             {
-                if (!GameSystem.stop)
+                if (!GameSystem.Instance.Stop)
                 {
                     damaged = true;
-                    StartCoroutine("DamageEffects");
+                    StartCoroutine(CoroutineNameDamageEffect);
                     Damage(miko.KamiAttack);
                     rb.velocity = Vector2.zero;
-                    Debug.Log(HP);
+                    //Debug.Log(HP);
                     if (hp <= 0)
                     {
                         stun = true;
-                        sr.sprite = s[(int)State.Stun];
+                        act = null;
+                        sr.sprite = s[StunSprite];
                         ActiveStunEffect(true);
-                        StartCoroutine("Revivals");
+                        //rb.bodyType = RigidbodyType2D.Dynamic;
+                        StartCoroutine(CoroutineNameRevival);
                     }
                 }
             }
@@ -100,7 +186,7 @@ public class Karakasa : Enemy
     {
         if (miko.transform.position.x < transform.position.x)
         {
-            jumpPower.x = -JUMP_POWER_X;
+            jumpPower.x = -JumpPowerX;
             if (sr.flipX)
             {
                 sr.flipX = false;
@@ -109,68 +195,36 @@ public class Karakasa : Enemy
         }
         else
         {
-            jumpPower.x = JUMP_POWER_X;
+            jumpPower.x = JumpPowerX;
             if (!sr.flipX)
             {
                 sr.flipX = true;
                 ColliderFlip(true);
             }
         }
-        sr.sprite = s[(int)State.Jumping];
-        state = State.Jumping;
-        jumpPower.y = count == 2 ? JUMP_POWER2 : JUMP_POWER;
+        sr.sprite = s[JumpSprite];
+        act = JumpingProcess;
+        jumpPower.y = jumpCount == 2 ? HighJumpPower : JumpPower;
         rb.AddForce(jumpPower, ForceMode2D.Impulse);
-        count = (count + 1) % 3;
-    }
-
-    void Move()
-    {
-        if (!damaged && rb.velocity.y < 0 && count == 0)
-        {
-            if (state != State.Glide)
-            {
-                state = State.Glide;
-                sr.sprite = s[(int)State.Glide];
-            }
-            rb.AddForce(Vector2.down * FLOATING_POWER * rb.velocity.y);
-            if (miko.transform.position.x < transform.position.x)
-            {
-                rb.AddForce((rb.velocity.x < 0 ? JUMP_POWER2 / 5 : JUMP_POWER2) * Vector2.left);
-                if (sr.flipX)
-                {
-                    sr.flipX = false;
-                    ColliderFlip(false);
-                }
-            }
-            else
-            {
-                rb.AddForce((rb.velocity.x > 0 ? JUMP_POWER2 / 5 : JUMP_POWER2) * Vector2.right);
-                if (!sr.flipX)
-                {
-                    sr.flipX = true;
-                    ColliderFlip(true);
-                }
-            }
-        }
-        hitArea.transform.position = transform.position;
+        jumpCount = (jumpCount + 1) % 3;
     }
 
     void ColliderFlip(bool b)
     {
         if (b)
         {
-            tmp.Set(-COLLIDER_OFFSET.x, COLLIDER_OFFSET.y, 0);
+            tmp.Set(-ColliderOffset.x, ColliderOffset.y);
             cc.offset = tmp;
             hitArea.offset = tmp;
-            tmp.y = BOXCOLLIDER_OFFSETY;
+            tmp.y = BoxColliderOffsetY;
             bc.offset = tmp;
         }
         else
         {
-            tmp.Set(COLLIDER_OFFSET.x, COLLIDER_OFFSET.y, 0);
+            tmp.Set(ColliderOffset.x, ColliderOffset.y);
             cc.offset = tmp;
             hitArea.offset = tmp;
-            tmp.y = BOXCOLLIDER_OFFSETY;
+            tmp.y = BoxColliderOffsetY;
             bc.offset = tmp;
         }
     }
@@ -182,10 +236,16 @@ public class Karakasa : Enemy
         {
             if (!stun)
             {
-                rb.velocity = Vector2.zero;
-                sr.sprite = s[(int)State.Squat];
-                state = State.Squat;
-                StartCoroutine("Squat");
+                sr.sprite = s[SquatSprite];
+                if (jumpCount == 0)
+                {
+                    act = SlidingProcess;
+                }
+                else
+                {
+                    rb.velocity = Vector2.zero;
+                    act = SquatingProcess;
+                }
                 if (damaged)
                 {
                     damaged = false;
@@ -194,39 +254,23 @@ public class Karakasa : Enemy
         }
     }
 
-    private IEnumerator Revivals()
+    private IEnumerator RevivalCoroutine()
     {
-        yield return stunTime;
+        yield return GameSystem.Instance.FiveSecond;
         ActiveStunEffect(false);
         stun = false;
         Revival();
-        sr.sprite = s[(int)State.Squat];
-        state = State.Squat;
-        StartCoroutine("Squat");
-        count = 0;
+        sr.sprite = s[SquatSprite];
+        act = SquatingProcess;
+        jumpCount = 0;
     }
 
-    private IEnumerator DamageEffects()
+    private IEnumerator DamageEffectCoroutine()
     {
         DamageEffect();
         yield return null;
         yield return null;
         yield return null;
-        ResetM();
-    }
-
-    private IEnumerator Squat()
-    {
-        yield return squatTime;
-        if (!stun)
-        {
-            state = State.Jumping;
-            sr.sprite = s[(int)State.Jumping];
-            if (damaged)
-            {
-                damaged = false;
-            }
-            Jump();
-        }
+        ResetMaterial();
     }
 }

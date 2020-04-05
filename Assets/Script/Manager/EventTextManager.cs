@@ -12,8 +12,8 @@ public class EventTextManager : MonoBehaviour
     readonly string[] escapeSecences = { "$", ":" };
     readonly string[] triggerString = {"$name", "$wait"};
 
-    [SerializeField] Text mainText;
-    [SerializeField] Text nameText;
+    [SerializeField] Text mainText = default;
+    [SerializeField] Text nameText = default;
 
     List<string> multipleText = null;
     int indexNum = 0;
@@ -73,7 +73,7 @@ public class EventTextManager : MonoBehaviour
 
     private void SingleText()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
         {
             Release();
         }
@@ -93,7 +93,7 @@ public class EventTextManager : MonoBehaviour
             {
                 mainText.text = multipleText[indexNum].Substring(0, displayNum++);
 
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (Input.GetMouseButtonDown(0))
                 {
                     displayNum = multipleText[indexNum].Length;
                     mainText.text = multipleText[indexNum];
@@ -102,7 +102,7 @@ public class EventTextManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
         {
             if (multipleText.Count <= indexNum + 1)
             {
@@ -137,14 +137,16 @@ public class EventTextManager : MonoBehaviour
 
     private void Lock()
     {
-        GameSystem.stop = true;
+        GameSystem.Instance.Stop = true;
+        TrainingSceneManager.Instance.IsOperational = false;
         Time.timeScale = 0;
         gameObject.SetActive(true);
     }
 
     private void Release()
     {
-        GameSystem.stop = false;
+        GameSystem.Instance.Stop = false;
+        TrainingSceneManager.Instance.IsOperational = true;
         Time.timeScale = 1;
         nameText.text = null;
         mainText.text = null;

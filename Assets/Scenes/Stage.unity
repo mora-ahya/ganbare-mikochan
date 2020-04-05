@@ -323,7 +323,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &110010421
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1989,7 +1989,6 @@ MonoBehaviour:
   cc: {fileID: 824170528}
   cc2: {fileID: 296581199}
   bc: {fileID: 1582011953}
-  sm: {fileID: 1154845749}
   damageEffect: {fileID: 2100000, guid: 175aef3737f5a3d44a5fca8724a8f4a9, type: 2}
   defaultM: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   cm: {fileID: 407241228}
@@ -2071,7 +2070,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475169754}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.2, y: -2.3, z: 0}
+  m_LocalPosition: {x: 172.14, y: 3.37, z: 0}
   m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_Children:
   - {fileID: 824170527}
@@ -7574,15 +7573,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ae19139bf4e00c45b93d5f8a03fb7bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyStop: 0
   mikochan: {fileID: 475169755}
-  tsm: {fileID: 110010425}
-  etm: {fileID: 1911026921}
-  mpe: {fileID: 407241227}
   hm: {fileID: 1226509199}
   cgse: {fileID: 407241229}
   darkness: {fileID: 1963145144}
   whiteness: {fileID: 1478676258}
+  enemyStop: 0
+  Stop: 0
+  IsGameOver: 1
 --- !u!4 &866839422
 Transform:
   m_ObjectHideFlags: 0
@@ -7915,7 +7913,6 @@ MonoBehaviour:
   hpBar: {fileID: 1530249999}
   hpText: {fileID: 1840483755}
   expText: {fileID: 411362235}
-  miko: {fileID: 475169755}
 --- !u!1 &1190870958
 GameObject:
   m_ObjectHideFlags: 0
@@ -19683,6 +19680,11 @@ PrefabInstance:
         type: 3}
       propertyPath: hp
       value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7582380963182374805, guid: 3578afab242f87b449d8492a4f3ee440,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3578afab242f87b449d8492a4f3ee440, type: 3}

@@ -7,18 +7,10 @@ public class SoundManager : MonoBehaviour
     static SoundManager soundManagerInstance;
     public static SoundManager Instance => soundManagerInstance;
 
-    public static readonly int EXPLOSION = 0;
-    public static readonly int SHOT_SOUND = 1;
-
-    public static readonly int TITLE_BGM = 0;
-    public static readonly int GAME_BGM = 1;
-    public static readonly int END1_BGM = 2;
-    public static readonly int END2_BGM = 3;
-
-    [SerializeField] AudioSource bgmSource;
-    [SerializeField] AudioSource seSource;
-    [SerializeField] AudioClip[] ses;
-    [SerializeField] AudioClip[] bgms;
+    [SerializeField] AudioSource bgmSource = default;
+    [SerializeField] AudioSource seSource = default;
+    [SerializeField] AudioClip[] ses = default;
+    [SerializeField] AudioClip[] bgms = default;
 
     // Start is called before the first frame update
     void Awake()

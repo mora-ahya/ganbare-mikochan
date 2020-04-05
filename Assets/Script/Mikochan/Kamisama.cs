@@ -6,23 +6,27 @@ public class Kamisama : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("enemy"))
+        if (!other.gameObject.CompareTag(Enemy.TagNameEnemy))
+            return;
+
+        Enemy tmp = other.gameObject.GetComponent<Enemy>();
+        tmp.InRange = true;
+        if (!tmp.CurrentMaterialIsDamageEffect())
         {
-            Enemy tmp = other.gameObject.GetComponent<Enemy>();
-            tmp.InRange = true;
             tmp.OutLine();
-            //Debug.Log(other.gameObject.GetComponent<Enemy>().transform.position.x);
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        //Debug.Log(true);
-        if (other.gameObject.CompareTag("enemy"))
+        if (!other.gameObject.CompareTag(Enemy.TagNameEnemy))
+            return;
+
+        Enemy tmp = other.gameObject.GetComponent<Enemy>();
+        tmp.InRange = false;
+        if (!tmp.CurrentMaterialIsDamageEffect())
         {
-            Enemy tmp = other.gameObject.GetComponent<Enemy>();
-            tmp.InRange = false;
-            tmp.ResetM();
+            tmp.ResetMaterial();
         }
     }
 }

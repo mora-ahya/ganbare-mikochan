@@ -9,6 +9,7 @@ public class StageManager : MonoBehaviour
     public static StageManager Instance => smInstance;
 
     [SerializeField] GameObject currentStage = default;
+    Stage stage;
     GameObject preStage = null;
     GameObject tmp;
 
@@ -20,8 +21,16 @@ public class StageManager : MonoBehaviour
     void Start()
     {
         if (currentStage != default)
-            currentStage.GetComponent<Stage>().Initialize();
+        {
+            stage = currentStage.GetComponent<Stage>();
+            stage.Initialize();
+        }
 
+    }
+
+    public void Act()
+    {
+        stage.Act();
     }
 
     public void Transition(GameObject nextStage)

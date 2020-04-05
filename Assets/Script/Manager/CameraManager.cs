@@ -11,8 +11,8 @@ public class CameraManager : MonoBehaviour
     [SerializeField] float stageLeft = -7;
     float minDifY = -2.0f;
 
-    [SerializeField] GameObject postCamera;
-    [SerializeField] MyPostEffects mpe;
+    [SerializeField] GameObject postCamera = default;
+    [SerializeField] MyPostEffects mpe = default;
 
     Vector3 tmp = new Vector3(0, 0, -10);
     Vector2 dif = new Vector2(1.0f, 2.0f);
@@ -25,6 +25,7 @@ public class CameraManager : MonoBehaviour
     float value = 0;
     float fixedPos = 0;
 
+    public MyPostEffects MainPostEffect => mpe;
 
     public bool GetShake => shake;
 

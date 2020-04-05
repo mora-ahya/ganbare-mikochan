@@ -8,27 +8,29 @@ public class GameSystem : MonoBehaviour
 {
     static GameSystem gameSystemInstance;
     public static GameSystem Instance => gameSystemInstance;
-    public static bool stop = false;
-    public static bool gameOver = true;
 
-    public bool enemyStop;
+    public readonly WaitForSeconds QuarterSecond = new WaitForSeconds(0.25f);
+    public readonly WaitForSeconds HalfSecond = new WaitForSeconds(0.5f);
+    public readonly WaitForSeconds OneSecond = new WaitForSeconds(1f);
+    public readonly WaitForSeconds TwoSecond = new WaitForSeconds(2f);
+    public readonly WaitForSeconds ThreeSecond = new WaitForSeconds(3f);
+    public readonly WaitForSeconds FourSecond = new WaitForSeconds(4f);
+    public readonly WaitForSeconds FiveSecond = new WaitForSeconds(5f);
 
     bool movie;
-    bool canOpenTS = true;
-    float waitTime;
-
-    public bool Movie => movie;
-    public Image Darkness => darkness;
-    public Image Whiteness => whiteness;
 
     [SerializeField] Mikochan mikochan = default;
-    [SerializeField] TrainingSceneManager tsm = default;
-    [SerializeField] EventTextManager etm = default;
-    [SerializeField] MyPostEffects mpe = default;
-    [SerializeField] HowlManager hm = default;
+    //[SerializeField] HowlManager hm = default;
     [SerializeField] CircleGrayScaleEffect cgse = default;
     [SerializeField] Image darkness = default;
     [SerializeField] Image whiteness = default;
+
+    public bool enemyStop;
+    public bool Movie => movie;
+    public bool Stop = false;
+    public bool IsGameOver = true;
+    public Image Darkness => darkness;
+    public Image Whiteness => whiteness;
 
     void Awake()
     {
@@ -40,38 +42,21 @@ public class GameSystem : MonoBehaviour
     {
         darkness.CrossFadeAlpha(0, 0, true);
         darkness.gameObject.SetActive(true);
-        stop = false;
+        Stop = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (canOpenTS && !etm.gameObject.activeSelf && Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (stop)
-            {
-                mpe.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, false);
-                stop = false;
-                Time.timeScale = 1.0f;
-                if (tsm.IsRunning)
-                {
-                    tsm.ParticleOff();
-                }
-                tsm.gameObject.SetActive(false);
-            }
-            else
-            {
-                mpe.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, true);
-                stop = true;
-                Time.timeScale = 0;
-                tsm.gameObject.SetActive(true);
-            }
+            TrainingSceneManager.Instance.DisplayTrainingScene();
         }
         /* //テスト実装
         if (Input.GetKeyDown(KeyCode.Z)) {
-            if (mpe.GetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT) && enemyStop)
+            if (CameraManager.Instance.MainPostEffect.GetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT) && enemyStop)
             {
-                mpe.SetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT, false);
+                CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT, false);
                 enemyStop = false;
             }
             else if (!enemyStop)
@@ -83,7 +68,7 @@ public class GameSystem : MonoBehaviour
             }
         }
 
-        if (mpe.GetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT))
+        if (CameraManager.Instance.MainPostEffect.GetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT))
         {
             cgse.radius += 0.05f;
             if (cgse.radius > 2f)
@@ -93,29 +78,48 @@ public class GameSystem : MonoBehaviour
         }
         */
         //Debug.Log(Input.mousePosition);
+        StageManager.Instance.Act();
+    }
+
+    public void GameStop()
+    {
+        Stop = true;
+        Time.timeScale = 0;
+    }
+
+    public void GameRestart()
+    {
+        Stop = false;
+        Time.timeScale = 1f;
     }
 
     public void GameOver()
     {
-        canOpenTS = false;
-        gameOver = true;
-        waitTime = 0.5f;
+        TrainingSceneManager.Instance.IsOperational = false;
+        IsGameOver = true;
         StartCoroutine("ToResult");
         Time.timeScale = 0;
     }
 
     public void GameClear()
     {
-        canOpenTS = false;
-        gameOver = false;
-        waitTime = 5.0f;
+        TrainingSceneManager.Instance.IsOperational = false;
+        IsGameOver = false;
         StartCoroutine("ToResult");
     }
 
     IEnumerator ToResult()
     {
-        darkness.CrossFadeAlpha(1.0f, waitTime, true);
-        yield return new WaitForSecondsRealtime(waitTime);
+        if (IsGameOver)
+        {
+            darkness.CrossFadeAlpha(1.0f, 0.5f, true);
+            yield return HalfSecond;
+        }
+        else
+        {
+            darkness.CrossFadeAlpha(1.0f, 5.0f, true);
+            yield return FiveSecond;
+        }
         SceneManager.LoadScene("Result");
     }
 

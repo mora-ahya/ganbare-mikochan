@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class Scarecrow : Enemy
 {
-    [SerializeField] BoxCollider2D hitArea;
-    [SerializeField] Sprite[] s;
-    readonly WaitForSeconds stunTime = new WaitForSeconds(5.0f);
+    [SerializeField] BoxCollider2D hitArea = default;
+    [SerializeField] Sprite[] s = default;
 
     void FixedUpdate()
     {
@@ -23,7 +22,7 @@ public class Scarecrow : Enemy
             //Debug.Log(self.InRange);
             if (hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
             {
-                if (!GameSystem.stop)
+                if (!GameSystem.Instance.Stop)
                 {
                     StartCoroutine("DamageEffects");
                     Damage(Mikochan.Instance.KamiAttack);
@@ -42,7 +41,7 @@ public class Scarecrow : Enemy
 
     private IEnumerator Revivals()
     {
-        yield return stunTime;
+        yield return GameSystem.Instance.FiveSecond;
         ActiveStunEffect(false);
         stun = false;
         Revival();
@@ -55,6 +54,6 @@ public class Scarecrow : Enemy
         yield return null;
         yield return null;
         yield return null;
-        ResetM();
+        ResetMaterial();
     }
 }

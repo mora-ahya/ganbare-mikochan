@@ -5,28 +5,34 @@ using UnityEngine.UI;
 
 public class StatusManager : MonoBehaviour
 {
-    [SerializeField] Slider hpBar;
-    [SerializeField] Text hpText;
-    [SerializeField] Text expText;
-    [SerializeField] Mikochan miko;
+    static StatusManager statusManagerInstance;
+    public static StatusManager Instance => statusManagerInstance;
 
-    // Start is called before the first frame update
+    [SerializeField] Slider hpBar = default;
+    [SerializeField] Text hpText = default;
+    [SerializeField] Text expText = default;
+
+    void Awake()
+    {
+        statusManagerInstance = this;
+    }
+
     void Start()
     {
-        hpBar.maxValue = miko.MaxHP;
-        hpBar.value = miko.HP;
+        hpBar.maxValue = Mikochan.Instance.MaxHP;
+        hpBar.value = Mikochan.Instance.HP;
         hpText.text = hpBar.value.ToString() + " / " + hpBar.maxValue.ToString();
     }
 
     public void updateHP()
     {
-        hpBar.maxValue = miko.MaxHP;
-        hpBar.value = miko.HP;
+        hpBar.maxValue = Mikochan.Instance.MaxHP;
+        hpBar.value = Mikochan.Instance.HP;
         hpText.text = hpBar.value.ToString() + " / " + hpBar.maxValue.ToString();
     }
 
     public void updateExp()
     {
-        expText.text = miko.Exp.ToString();
+        expText.text = Mikochan.Instance.Exp.ToString();
     }
 }

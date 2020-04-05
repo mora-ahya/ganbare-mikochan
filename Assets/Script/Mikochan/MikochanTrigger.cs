@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class MikochanTrigger : MonoBehaviour
 {
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] CapsuleCollider2D cc;
+    [SerializeField] Rigidbody2D rb = default;
+    [SerializeField] CapsuleCollider2D cc = default;
     Vector2 knockBack = new Vector2(0, 3f);
     Enemy target = null;
     Mikochan mikochan;
@@ -22,58 +22,65 @@ public class MikochanTrigger : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (target != null)
-        {
-            if (!target.Stun)
-            {
-                if (!mikochan.Damaged && !mikochan.Invincible)
-                {
-                    rb.velocity = Vector2.zero;
-                    mikochan.ChangeHp(-target.Attack);
-                    knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
-                    rb.AddForce(knockBack, ForceMode2D.Impulse);
-                    mikochan.Invincible = true;
-                    mikochan.Damaged = true;
-                    mikochan.DoIEnumerator("Inv");
-                    mikochan.DoIEnumerator("KnockBack");
-                }
-            }
-            else if (mikochan.Squat)
-            {
-                mikochan.GetExp(target.Exp);
-                target.ResetPos();
-                target.gameObject.SetActive(false);
-                target.ResetFlag = true;
-                target = null;
-            }
-        }
+        EnemyDamage();
+        EnemySealed();
         TrapDamage();
+    }
+
+    void EnemyDamage()
+    {
+        if (target == null || target.Stun)
+            return;
+
+        if (mikochan.Damaged || mikochan.Invincible)
+            return;
+
+        rb.velocity = Vector2.zero;
+        mikochan.ChangeHp(-target.Attack);
+        knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
+        rb.AddForce(knockBack, ForceMode2D.Impulse);
+        mikochan.Invincible = true;
+        mikochan.Damaged = true;
+        mikochan.DoIEnumerator("Inv");
+        mikochan.DoIEnumerator("KnockBack");
+    }
+
+    void EnemySealed()
+    {
+        if (target == null || !mikochan.Squat)
+            return;
+
+        mikochan.GetExp(target.Exp);
+        target.ResetPos();
+        target.gameObject.SetActive(false);
+        target.ResetFlag = true;
+        target = null;
     }
 
     void TrapDamage()
     {
-        if (inTrap && !mikochan.Damaged && !mikochan.Invincible)
-        {
-            rb.velocity = Vector2.zero;
-            mikochan.TrapDamage(0.05f);
-            knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
-            rb.AddForce(knockBack, ForceMode2D.Impulse);
-            mikochan.Invincible = true;
-            mikochan.Damaged = true;
-            mikochan.DoIEnumerator("Inv");
-            mikochan.DoIEnumerator("KnockBack");
-        }
+        if (!inTrap || mikochan.Damaged || mikochan.Invincible)
+            return;
+
+        rb.velocity = Vector2.zero;
+        mikochan.TrapDamage(0.05f);
+        knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
+        rb.AddForce(knockBack, ForceMode2D.Impulse);
+        mikochan.Invincible = true;
+        mikochan.Damaged = true;
+        mikochan.DoIEnumerator("Inv");
+        mikochan.DoIEnumerator("KnockBack");
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log(true);
         if (other.gameObject.CompareTag("enemy"))
         {
             target = other.gameObject.GetComponent<Enemy>();
-            //Debug.Log(squat);
+            return;
         }
-        else if (other.gameObject.CompareTag("Trap"))
+
+        if (other.gameObject.CompareTag("Trap"))
         {
             inTrap = true;
         }
@@ -87,8 +94,10 @@ public class MikochanTrigger : MonoBehaviour
             {
                 target = null;
             }
+            return;
         }
-        else if (other.gameObject.CompareTag("Trap"))
+
+        if (other.gameObject.CompareTag("Trap"))
         {
             inTrap = false;
         }

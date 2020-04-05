@@ -162,7 +162,7 @@ Transform:
   m_GameObject: {fileID: 1461822450452852898}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.5, y: 3.5, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 1461822451304779127}
   - {fileID: 7551629094237359245}
@@ -261,10 +261,10 @@ MonoBehaviour:
   eaa: {fileID: 1461822451889600834}
   defaultPos: {fileID: 1461822450332830669}
   stunEffect: {fileID: 227952626874756064}
-  _animator: {fileID: 1461822450452852923}
+  rb: {fileID: 1461822450452852897}
+  animator: {fileID: 1461822450452852923}
   cc: {fileID: 1461822450452852896}
   hitArea: {fileID: 1461822452103005202}
-  rb: {fileID: 1461822450452852897}
   stunSprite: {fileID: 21300018, guid: 58eb5bbe4935ab94495a7ea084bdd0bc, type: 3}
 --- !u!70 &1461822450452852896
 CapsuleCollider2D:
@@ -347,7 +347,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.15}
+  m_Offset: {x: -0.75, y: 0.15}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -358,7 +358,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.1, y: 0.18}
+  m_Size: {x: 1.4, y: 0.1}
   m_EdgeRadius: 0
 --- !u!1 &1461822451889600844
 GameObject:
@@ -416,7 +416,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 25, y: 20}
+  m_Size: {x: 25, y: 17.5}
   m_EdgeRadius: 0
 --- !u!114 &1461822451889600834
 MonoBehaviour:
@@ -430,8 +430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b4c3ea26658404488d81c183cbb80b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  self: {fileID: 1461822450452852897}
-  self2: {fileID: 1461822450452852903}
+  self: {fileID: 1461822450452852903}
 --- !u!1 &1461822452103005212
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,7 +457,7 @@ Transform:
   m_GameObject: {fileID: 1461822452103005212}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.5, y: 3.5, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children: []
   m_Father: {fileID: 1461822450332830669}
   m_RootOrder: 2

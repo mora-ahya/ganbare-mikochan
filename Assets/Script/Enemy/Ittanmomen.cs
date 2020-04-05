@@ -4,40 +4,38 @@ using UnityEngine;
 
 public class Ittanmomen : Enemy
 {
-    static readonly float MOVE_RANGE = 7.5f;
+    static readonly Vector2 InitialVeclocity = new Vector2(7f, 3f);
 
-    [SerializeField] Animator _animator;
-    [SerializeField] CircleCollider2D cc;
-    [SerializeField] CircleCollider2D hitArea;
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] Sprite stunS;
-    readonly WaitForSeconds stunTime = new WaitForSeconds(5.0f);
+    [SerializeField] Animator _animator = default;
+    //[SerializeField] CircleCollider2D cc = default;
+    [SerializeField] CircleCollider2D hitArea = default;
+    [SerializeField] Sprite stunS = default;
 
-    private Vector2 defaultPoss;
-    private bool descent = false;
-    private Mikochan miko;
+    Vector2 vibrationCenter;
+    Vector2 tmp;
+    Mikochan miko;
+    Action act;
     // Start is called before the first frame update
     void Start()
     {
-        defaultPoss = (Vector2)(transform.position) + (Vector2.right * MOVE_RANGE);
+        vibrationCenter = transform.position;
         miko = Mikochan.Instance;
     }
 
     public override void Set()
     {
-        stun = false;
         inRange = false;
         rb.gravityScale = 0;
-        descent = false;
-        defaultPoss = (Vector2)(transform.position) + (Vector2.right * MOVE_RANGE);
         _animator.enabled = true;
         Revival();
-        ResetM();
+        ResetMaterial();
         ActiveStunEffect(false);
+        act = FloatingProcess;
+        stun = false;
+
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    public override void Act()
     {
         if (resetFlag)
         {
@@ -47,8 +45,9 @@ public class Ittanmomen : Enemy
         if (!stun)
         {
             MouseEvent();
-            Move();
+            act?.Invoke();
         }
+        hitArea.transform.position = transform.position;
         SetActiveAreaPosition();
     }
 
@@ -59,75 +58,99 @@ public class Ittanmomen : Enemy
             //Debug.Log(self.InRange);
             if (hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
             {
-                if (!GameSystem.stop)
+                if (!GameSystem.Instance.Stop)
                 {
-                    StartCoroutine("DamageEffects");
+                    StartCoroutine(CoroutineNameDamageEffect);
                     Damage(miko.KamiAttack);
                     rb.velocity = Vector2.zero;
-                    Debug.Log(hp);
                     if (hp <= 0)
                     {
                         rb.gravityScale = 1.0f;
                         stun = true;
                         _animator.enabled = false;
                         sr.sprite = stunS;
+                        act = null;
                         ActiveStunEffect(true);
-                        StartCoroutine("Revivals");
+                        StartCoroutine(CoroutineNameRevival);
                     }
                 }
             }
         }
     }
 
-    void Move()
+    public void FloatingProcess()
     {
-        if (descent)
+        rb.AddForce(Vector2.up * (vibrationCenter.y - transform.position.y) * 1.2f);
+        if (gameObject.transform.position.y >= vibrationCenter.y && rb.velocity.y >= 0)
         {
-            rb.AddForce(Vector2.up * (defaultPoss.y - transform.position.y));
-            if (rb.position.y > defaultPoss.y && rb.velocity.y > 0)
-            {
-                descent = false;
-                rb.velocity = Vector2.zero;
-                defaultPoss = (Vector2)(transform.position) + (Vector2.right * MOVE_RANGE);
-            }
-        }
-        else
-        {
-            rb.AddForce(Vector2.right * (defaultPoss.x - transform.position.x));
-        }
-        hitArea.transform.position = transform.position;
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (!descent)
-        {
-            if (collision.gameObject.CompareTag("mikochan"))
-            {
-                rb.velocity = Vector2.zero;
-                rb.AddForce(collision.gameObject.transform.position - transform.position, ForceMode2D.Impulse);
-                descent = true;
-            }
+            rb.velocity = Vector2.zero;
+            vibrationCenter = transform.position;
+            act = DriftingProcess;
+            rb.AddForce(InitialVeclocity, ForceMode2D.Impulse);
         }
     }
 
-    private IEnumerator Revivals()
+    public void DriftingProcess()
     {
-        yield return stunTime;
+        tmp = vibrationCenter - (Vector2)transform.position;
+        tmp.y *= 20f;
+        rb.AddForce(tmp);
+    }
+
+    //void Move()
+    //{
+    //    if (descent)
+    //    {
+    //        rb.AddForce(Vector2.up * (vibrationCenter.y - transform.position.y));
+    //        if (rb.position.y > vibrationCenter.y && rb.velocity.y > 0)
+    //        {
+    //            descent = false;
+    //            rb.velocity = Vector2.zero;
+    //            vibrationCenter = (Vector2)(transform.position) + (Vector2.right * MoveRange);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        rb.AddForce(Vector2.right * (vibrationCenter.x - transform.position.x));
+    //    }
+    //    hitArea.transform.position = transform.position;
+    //}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (act == DriftingProcess && collision.gameObject.CompareTag("mikochan"))
+        {
+
+            rb.velocity = Vector2.zero;
+            rb.AddForce((collision.gameObject.transform.position - transform.position) * 1.2f, ForceMode2D.Impulse);
+            act = FloatingProcess;
+            return;
+        }
+
+        if (stun && collision.gameObject.CompareTag("Ground"))
+        {
+            rb.velocity = Vector2.zero;
+        }
+
+    }
+
+    private IEnumerator RevivalCoroutine()
+    {
+        yield return GameSystem.Instance.FiveSecond;
         stun = false;
-        descent = true;
+        act = FloatingProcess;
         rb.gravityScale = 0;
         _animator.enabled = true;
         ActiveStunEffect(false);
         Revival();
     }
 
-    private IEnumerator DamageEffects()
+    private IEnumerator DamageEffectCoroutine()
     {
         DamageEffect();
         yield return null;
         yield return null;
         yield return null;
-        ResetM();
+        ResetMaterial();
     }
 }

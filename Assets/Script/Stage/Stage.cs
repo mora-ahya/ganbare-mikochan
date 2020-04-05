@@ -24,4 +24,18 @@ public class Stage : MonoBehaviour
             CameraManager.Instance.SetBackView(backview);
         }
     }
+
+    public void Act()
+    {
+        if (!TrainingSceneManager.Instance.gameObject.activeSelf)
+        {
+            foreach (Enemy enemy in enemies)
+            {
+                if (enemy.gameObject.activeSelf)
+                {
+                    enemy.Act();
+                }
+            }
+        }
+    }
 }

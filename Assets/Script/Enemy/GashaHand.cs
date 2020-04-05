@@ -4,23 +4,18 @@ using UnityEngine;
 
 public class GashaHand : Enemy
 {
-    [SerializeField] float waitTime;
-    private WaitForSeconds wait;
+    [SerializeField] float waitTime = default;
+    WaitForSeconds wait;
 
     void Start()
     {
         wait = new WaitForSeconds(waitTime);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Ground"))
-        {
-            if (!CameraManager.Instance.GetShake)
-            {
-                StartCoroutine("Shake");
-            }
-        }
+        if (other.CompareTag("Ground") && !CameraManager.Instance.GetShake)
+            StartCoroutine("Shake");
         //Debug.Log(other.gameObject.tag);
     }
 

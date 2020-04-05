@@ -8,21 +8,19 @@ public class Mikochan : MonoBehaviour
 
     public static Mikochan Instance => mikoInstance;
 
-    [SerializeField] Rigidbody2D rb;
-    [SerializeField] Animator animator;
-    [SerializeField] SpriteRenderer sr;
-    [SerializeField] CapsuleCollider2D cc;
-    [SerializeField] CapsuleCollider2D cc2;
-    [SerializeField] BoxCollider2D bc;
-    [SerializeField] StatusManager sm;
-    [SerializeField] Material damageEffect;
-    [SerializeField] Material defaultM;
-    [SerializeField] CameraManager cm;
-    [SerializeField] GameSystem gs;
-    [SerializeField] GameObject kamisama;
-    [SerializeField] MyPostEffects mpe;
+    [SerializeField] Rigidbody2D rb = default;
+    [SerializeField] Animator animator = default;
+    [SerializeField] SpriteRenderer sr = default;
+    [SerializeField] CapsuleCollider2D cc = default;
+    [SerializeField] CapsuleCollider2D cc2 = default;
+    [SerializeField] BoxCollider2D bc = default;
+    [SerializeField] Material damageEffect = default;
+    [SerializeField] Material defaultM = default;
+    [SerializeField] CameraManager cm = default;
+    [SerializeField] GameSystem gs = default;
+    [SerializeField] GameObject kamisama = default;
+    [SerializeField] MyPostEffects mpe = default;
 
-    readonly WaitForSeconds oneSecond = new WaitForSeconds(1f);
     readonly WaitForSeconds wait = new WaitForSeconds(0.08f);
     WaitForSeconds knockBackTime = new WaitForSeconds(0.3f);
     Vector2 tmp = new Vector2();
@@ -133,7 +131,7 @@ public class Mikochan : MonoBehaviour
     void Update()
     {
         //Debug.Log(state);
-        if (!GameSystem.stop || stop)
+        if (!GameSystem.Instance.Stop || stop)
         {
             if (!movie)
             {
@@ -341,7 +339,7 @@ public class Mikochan : MonoBehaviour
     {
         maxHp += amount;
         hp += amount;
-        sm.updateHP();
+        StatusManager.Instance.updateHP();
     }
 
     public void ExtendKamiArea()
@@ -362,7 +360,7 @@ public class Mikochan : MonoBehaviour
         {
             hp = MaxHP;
         }
-        sm.updateHP();
+        StatusManager.Instance.updateHP();
         if (hp <= 0)
         {
             gs.GameOver();
@@ -381,7 +379,7 @@ public class Mikochan : MonoBehaviour
         {
             exp = 99999;
         }
-        sm.updateExp();
+        StatusManager.Instance.updateExp();
     }
 
     public void TrapDamage(float per)

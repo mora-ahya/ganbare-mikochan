@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Koganeko : MonoBehaviour
 {
-    [SerializeField] Enemy self;
-    [SerializeField] Animator _animator;
-    [SerializeField] CapsuleCollider2D cc;
+    [SerializeField] Enemy self = default;
+    [SerializeField] Animator _animator = default;
+    [SerializeField] CapsuleCollider2D cc = default;
     WaitForSeconds stunTime = new WaitForSeconds(5.0f);
 
     // Start is called before the first frame update
@@ -35,7 +35,7 @@ public class Koganeko : MonoBehaviour
     void MouseEvent()
     {
         Debug.Log(self.InRange);
-        if (!GameSystem.stop)
+        if (!GameSystem.Instance.Stop)
         {
             if (!self.Stun && Input.GetMouseButtonDown(0))
             {
@@ -66,6 +66,6 @@ public class Koganeko : MonoBehaviour
     {
         self.DamageEffect();
         yield return null;
-        self.ResetM();
+        self.ResetMaterial();
     }
 }

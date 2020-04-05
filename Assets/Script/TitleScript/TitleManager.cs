@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
 {
-    [SerializeField] Image darkness;
+    [SerializeField] Image darkness = default;
     string changeDestination;
 
     // Start is called before the first frame update

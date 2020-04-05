@@ -9,9 +9,9 @@ public class ResultManager : MonoBehaviour
     const string gameover = "GAME OVER";
     const string gameclear = "GAME CLEAR";
 
-    [SerializeField] Text t;
-    [SerializeField] Image[] i;
-    [SerializeField] Image darkness;
+    [SerializeField] Text t = default;
+    [SerializeField] Image[] i = default;
+    [SerializeField] Image darkness = default;
 
     WaitForSeconds wait = new WaitForSeconds(2.0f);
     // Start is called before the first frame update
@@ -22,7 +22,7 @@ public class ResultManager : MonoBehaviour
             Time.timeScale = 1.0f;
         }
         darkness.gameObject.SetActive(true);
-        t.text = GameSystem.gameOver ? gameover : gameclear;
+        t.text = GameSystem.Instance.IsGameOver ? gameover : gameclear;
         StartCoroutine("Show");
     }
 
@@ -34,7 +34,7 @@ public class ResultManager : MonoBehaviour
         t.gameObject.SetActive(true);
         yield return wait;
         i[0].gameObject.SetActive(false);
-        (GameSystem.gameOver ? i[1] : i[2]).gameObject.SetActive(true);
+        (GameSystem.Instance.IsGameOver ? i[1] : i[2]).gameObject.SetActive(true);
         yield return wait;
         darkness.CrossFadeAlpha(1, 2.0f, true);
         yield return wait;

@@ -5,12 +5,16 @@ using UnityEngine.UI;
 
 public class TrainingSceneManager : MonoBehaviour
 {
-    static readonly float OHUDA_TOP = 424.5f;
-    static readonly float OHUDA_SPACE = 70f;
-    static readonly float BUTTON_LEFT = 525f;
-    static readonly float BUTTON_SPACE = 150f;
-    static readonly int MAX_LV = 25;
-    static readonly string[] EXPLAINS = new string[] {
+    static TrainingSceneManager trainingSceneManagerInstance;
+    public static TrainingSceneManager Instance => trainingSceneManagerInstance;
+
+    readonly float ohudaTop = 424.5f;
+    readonly float ohudaSpace = 70f;
+    readonly float buttonLeft = 525f;
+    readonly float buttonSpace = 150f;
+    readonly int maxLv = 25;
+    readonly int offset = 5;
+    readonly string[] explains = new string[] {
         "1回ごとに神様領域が少し広くなります。\n5回ごとに神様に関するスペシャルなスキルを獲得できます。",//kamiAreaButton
         "1回ごとにHPが5増加します。\n5回ごとにHPに関するスペシャルなスキルを獲得できます。",//hpButton
         "1回だけでは何も得られませんが、5回ごとにとてもスペシャルなスキルを獲得できます。",//verySpecialButton
@@ -29,33 +33,48 @@ public class TrainingSceneManager : MonoBehaviour
         "被ダメージ時の無敵時間が長くなります。"//verySpecialButton:5
     };
 
-    [SerializeField] Image[] ohudas;
-    [SerializeField] Button[] buttons;
-    [SerializeField] GameObject pConv;
-    [SerializeField] GameObject pDiver;
-    [SerializeField] ParticleSystem psConv;
-    [SerializeField] ParticleSystem psDiver;
-    [SerializeField] Text tExp;
-    [SerializeField] Text explain;
+    [SerializeField] Image[] ohudas = default;
+    [SerializeField] Button[] buttons = default;
+    [SerializeField] GameObject pConv = default;
+    [SerializeField] GameObject pDiver = default;
+    [SerializeField] ParticleSystem psConv = default;
+    [SerializeField] ParticleSystem psDiver = default;
+    [SerializeField] Text tExp = default;
+    [SerializeField] Text explain = default;
 
-    private ParticleSystem.MainModule psm;
-    private Image ohuda;
-    private Mikochan miko;
-    private readonly int offset = 5;
-    private bool isRunning = false;
-    private readonly WaitForSecondsRealtime w = new WaitForSecondsRealtime(0.05f);
-    private readonly WaitForSecondsRealtime w2 = new WaitForSecondsRealtime(0.5f);
+    ParticleSystem.MainModule psm;
+    Image ohuda;
+    Mikochan miko;
+    bool isRunning = false;
+    bool isOperational = true;
+    readonly WaitForSecondsRealtime w = new WaitForSecondsRealtime(0.05f);
 
-    private int kamiAreaLv = 1;//save対象
-    private int hpLv = 1;//save対象
-    private int specialLv = 1;//save対象
-    private int necessaryExp = 50;
-    private int tmp;
-    private float endAmount;
+    int kamiAreaLv = 1;//save対象
+    int hpLv = 1;//save対象
+    int specialLv = 1;//save対象
+    int necessaryExp = 50;
+    int tmp;
+    float endAmount;
 
-    public bool IsRunning => isRunning;
+    public bool IsOperational
+    {
+        get
+        {
+            return isOperational;
+        }
 
-    // Start is called before the first frame update
+        set
+        {
+            isOperational = value;
+        }
+    }
+
+    void Awake()
+    {
+        trainingSceneManagerInstance = this;
+        gameObject.SetActive(false);
+    }
+
     void Start()
     {
         //particle.transform.position = particle.transform.TransformPoint(new Vector3(100, 175, 0));
@@ -63,10 +82,29 @@ public class TrainingSceneManager : MonoBehaviour
         miko = Mikochan.Instance;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void DisplayTrainingScene()
     {
-
+        if (isOperational)
+        {
+            if (GameSystem.Instance.Stop)
+            {
+                CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, false);
+                GameSystem.Instance.Stop = false;
+                Time.timeScale = 1.0f;
+                if (isRunning)
+                {
+                    ParticleOff();
+                }
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, true);
+                GameSystem.Instance.Stop = true;
+                Time.timeScale = 0;
+                gameObject.SetActive(true);
+            }
+        }
     }
 
     void IncreaseNecessaryExp()
@@ -108,7 +146,7 @@ public class TrainingSceneManager : MonoBehaviour
 
     public void PushedButton0()
     {
-        if (!isRunning && kamiAreaLv <= MAX_LV && miko.Exp >= necessaryExp)
+        if (!isRunning && kamiAreaLv <= maxLv && miko.Exp >= necessaryExp)
         {
             //buttons[0].interactable = false;
             ohuda = ohudas[(int)((kamiAreaLv - 1) / offset)];
@@ -125,7 +163,7 @@ public class TrainingSceneManager : MonoBehaviour
             {
                 miko.Special(kamiAreaLv / offset + offset);
             }
-            if (kamiAreaLv == MAX_LV)
+            if (kamiAreaLv == maxLv)
             {
                 buttons[0].interactable = false;
             }
@@ -139,7 +177,7 @@ public class TrainingSceneManager : MonoBehaviour
 
     public void PushedButton1()
     {
-        if (!isRunning && hpLv <= MAX_LV && miko.Exp >= necessaryExp)
+        if (!isRunning && hpLv <= maxLv && miko.Exp >= necessaryExp)
         {
             ohuda = ohudas[(int)((hpLv - 1) / offset) + offset];
             isRunning = true;
@@ -155,7 +193,7 @@ public class TrainingSceneManager : MonoBehaviour
             {
                 miko.Special(hpLv / 5);
             }
-            if (hpLv == MAX_LV)
+            if (hpLv == maxLv)
             {
                 buttons[1].interactable = false;
             }
@@ -169,7 +207,7 @@ public class TrainingSceneManager : MonoBehaviour
 
     public void PushedButton2()
     {
-        if (!isRunning && specialLv <= MAX_LV && miko.Exp >= necessaryExp)
+        if (!isRunning && specialLv <= maxLv && miko.Exp >= necessaryExp)
         {
             ohuda = ohudas[(int)((specialLv - 1) / 5) + offset * 2];
             isRunning = true;
@@ -184,7 +222,7 @@ public class TrainingSceneManager : MonoBehaviour
             {
                 miko.Special(specialLv / 5 + offset * 2);
             }
-            if (specialLv == MAX_LV)
+            if (specialLv == maxLv)
             {
                 buttons[2].interactable = false;
             }
@@ -211,74 +249,74 @@ public class TrainingSceneManager : MonoBehaviour
 
     public void ExplainHPSpecial()
     {
-        tmp = (int)((OHUDA_TOP - Input.mousePosition.y) / OHUDA_SPACE);
+        tmp = (int)((ohudaTop - Input.mousePosition.y) / ohudaSpace);
         if ((hpLv - 1) / 5 > tmp || hpLv == 25)
         {
-            explain.text = EXPLAINS[tmp + 4];
+            explain.text = explains[tmp + 4];
         }
         else
         {
-            explain.text = EXPLAINS[3];
+            explain.text = explains[3];
         }
     }
 
     public void ExplainKamiSpecial()
     {
-        tmp = (int)((OHUDA_TOP - Input.mousePosition.y) / OHUDA_SPACE);
+        tmp = (int)((ohudaTop - Input.mousePosition.y) / ohudaSpace);
         if ((kamiAreaLv - 1) / 5 <= tmp && kamiAreaLv != 25)
         {
-            explain.text = EXPLAINS[3];
+            explain.text = explains[3];
         }
         else if (tmp == 4)
         {
-            explain.text = EXPLAINS[11];
+            explain.text = explains[11];
         }
         else if (tmp % 2 == 1 && tmp != 5)
         {
-            explain.text = EXPLAINS[10];
+            explain.text = explains[10];
         }
         else
         {
-            explain.text = EXPLAINS[9];
+            explain.text = explains[9];
         }
     }
 
     public void ExplainVerySpecial()
     {
-        tmp = (int)((OHUDA_TOP - Input.mousePosition.y) / OHUDA_SPACE);
+        tmp = (int)((ohudaTop - Input.mousePosition.y) / ohudaSpace);
         if ((specialLv - 1) / 5 <= tmp && specialLv != 25)
         {
-            explain.text = EXPLAINS[3];
+            explain.text = explains[3];
         }
         else if (tmp % 3 == 0)
         {
-            explain.text = EXPLAINS[12];
+            explain.text = explains[12];
         }
         else if (tmp == 1)
         {
-            explain.text = EXPLAINS[13];
+            explain.text = explains[13];
         }
         else if (tmp == 2)
         {
-            explain.text = EXPLAINS[14];
+            explain.text = explains[14];
         }
         else
         {
-            explain.text = EXPLAINS[15];
+            explain.text = explains[15];
         }
     }
 
     public void ExplainButton()
     {
-        tmp = (int)((Input.mousePosition.x - BUTTON_LEFT) / BUTTON_SPACE);
-        explain.text = EXPLAINS[tmp];
+        tmp = (int)((Input.mousePosition.x - buttonLeft) / buttonSpace);
+        explain.text = explains[tmp];
     }
 
     IEnumerator IncreaseFullAmount()
     {
         pConv.SetActive(true);
         endAmount = ohuda.fillAmount + 0.2f;
-        yield return w2;
+        yield return GameSystem.Instance.HalfSecond;
         pDiver.SetActive(true);
         while (ohuda.fillAmount < endAmount)
         {
@@ -291,9 +329,9 @@ public class TrainingSceneManager : MonoBehaviour
         if (endAmount >= 1)
         {
             ohuda.CrossFadeColor(Color.black, 0.5f, true, false);
-            yield return w2;
+            yield return GameSystem.Instance.HalfSecond;
             ohuda.CrossFadeColor(Color.white, 0.5f, true, false);
-            yield return w2;
+            yield return GameSystem.Instance.HalfSecond;
         }
         isRunning = false;
         //buttons[0].interactable = true;

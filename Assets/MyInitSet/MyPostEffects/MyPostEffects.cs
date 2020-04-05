@@ -9,7 +9,7 @@ public class MyPostEffects : MonoBehaviour
     public static readonly int SIMPLECOLOR_EFFECT = 2;
     public static readonly int CIRCLE_GRAYSCALE_EFFECT = 3;
 
-    [SerializeField] PostEffect[] postEffects;
+    [SerializeField] PostEffect[] postEffects = default;
 
     public bool GetEffectActive(int effectNum)
     {
