@@ -24,6 +24,9 @@ public class Ittanmomen : Enemy
 
     public override void Set()
     {
+        if (!resetFlag)
+            return;
+        
         inRange = false;
         rb.gravityScale = 0;
         _animator.enabled = true;
@@ -32,16 +35,11 @@ public class Ittanmomen : Enemy
         ActiveStunEffect(false);
         act = FloatingProcess;
         stun = false;
-
+        resetFlag = false;
     }
 
     public override void Act()
     {
-        if (resetFlag)
-        {
-            Set();
-            resetFlag = false;
-        }
         if (!stun)
         {
             MouseEvent();

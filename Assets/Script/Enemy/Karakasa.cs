@@ -37,6 +37,9 @@ public class Karakasa : Enemy
     // Start is called before the first frame update
     public override void Set()
     {
+        if (!resetFlag)
+            return;
+
         stun = false;
         inRange = false;
         Revival();
@@ -46,16 +49,11 @@ public class Karakasa : Enemy
         jumpCount = 1;
         ResetMaterial();
         ActiveStunEffect(false);
+        resetFlag = false;
     }
     
     public override void Act()
     {
-        if (resetFlag)
-        {
-            Set();
-            resetFlag = false;
-        }
-
         if (!stun)
         {
             MouseEvent();

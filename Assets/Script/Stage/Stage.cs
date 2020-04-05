@@ -11,6 +11,7 @@ public class Stage : MonoBehaviour
     {
         foreach (Enemy enemy in enemies)
         {
+            enemy.ResetFlag = true;
             enemy.Set();
             enemy.ResetPos();
             if (enemy.gameObject.activeSelf)

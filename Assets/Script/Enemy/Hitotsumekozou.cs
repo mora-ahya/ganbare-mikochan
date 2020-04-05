@@ -23,29 +23,30 @@ public class Hitotsumekozou : Enemy
 
     public override void Set()
     {
-        stun = false;
-        inRange = false;
-        animator.enabled = true;
-        act = SearchingProcess;
-        counter = 0;
         if (gameObject.activeSelf)
         {
             animator.SetBool(AnimBoolIsRun, false);
             animator.SetBool(AnimBoolIsStumble, false);
         }
+
         ChangeTriggerDir(false);
+        counter = 0;
+        act = SearchingProcess;
+
+        if (!resetFlag)
+            return;
+        
+        stun = false;
+        inRange = false;
+        animator.enabled = true;
         Revival();
         ResetMaterial();
         ActiveStunEffect(false);
+        resetFlag = false;
     } 
 
     public override void Act()
     {
-        if (resetFlag)
-        {
-            Set();
-            resetFlag = false;
-        }
         if (!stun)
         {
             MouseEvent();
@@ -91,7 +92,7 @@ public class Hitotsumekozou : Enemy
 
     void StumblingProcess()
     {
-        if (Mathf.Abs(rb.velocity.x) < 0.1f)
+        if (rb.velocity.x * dir < 0.1f)
         {
             rb.velocity = Vector2.zero;
             act = LyingProcess;
@@ -106,9 +107,9 @@ public class Hitotsumekozou : Enemy
     void LyingProcess()
     {
         counter++;
+        rb.velocity = Vector3.zero;
         if (hp <= 0)
         {
-            rb.velocity = Vector3.zero;
             stun = true;
             ActiveStunEffect(true);
             sr.sprite = stunSprite;
@@ -190,7 +191,7 @@ public class Hitotsumekozou : Enemy
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerStay2D(Collider2D collision)
     {
         if (act == SearchingProcess && collision.gameObject.CompareTag("mikochan"))
         {
