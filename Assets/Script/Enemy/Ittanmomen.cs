@@ -6,75 +6,57 @@ public class Ittanmomen : Enemy
 {
     static readonly Vector2 InitialVeclocity = new Vector2(7f, 3f);
 
-    [SerializeField] Animator _animator = default;
     //[SerializeField] CircleCollider2D cc = default;
     [SerializeField] CircleCollider2D hitArea = default;
     [SerializeField] Sprite stunS = default;
 
     Vector2 vibrationCenter;
     Vector2 tmp;
-    Mikochan miko;
-    Action act;
-    // Start is called before the first frame update
-    void Start()
-    {
-        vibrationCenter = transform.position;
-        miko = Mikochan.Instance;
-    }
 
+    // Start is called before the first frame update
     public override void Set()
     {
         if (!resetFlag)
             return;
-        
-        inRange = false;
+
+        base.Set();
+        vibrationCenter = transform.position;
         rb.gravityScale = 0;
-        _animator.enabled = true;
-        Revival();
-        ResetMaterial();
-        ActiveStunEffect(false);
+        animator.enabled = true;
         act = FloatingProcess;
-        stun = false;
-        resetFlag = false;
     }
 
     public override void Act()
     {
-        if (!stun)
-        {
-            MouseEvent();
-            act?.Invoke();
-        }
+        MouseEvent();
+        act();
         hitArea.transform.position = transform.position;
         SetActiveAreaPosition();
     }
 
     void MouseEvent()
     {
-        if (!invincible && inRange && Input.GetMouseButtonDown(0))
+        if (stun || invincible || !inRange || !Input.GetMouseButtonDown(0) || !hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+            return;
+
+        if (GameSystem.Instance.Stop)
+            return;
+
+        StartCoroutine(CoroutineNameDamageEffect);
+        Damage(Mikochan.Instance.KamiAttack);
+        rb.velocity = Vector2.zero;
+        if (hp <= 0)
         {
-            //Debug.Log(self.InRange);
-            if (hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
-            {
-                if (!GameSystem.Instance.Stop)
-                {
-                    StartCoroutine(CoroutineNameDamageEffect);
-                    Damage(miko.KamiAttack);
-                    rb.velocity = Vector2.zero;
-                    if (hp <= 0)
-                    {
-                        rb.gravityScale = 1.0f;
-                        stun = true;
-                        _animator.enabled = false;
-                        sr.sprite = stunS;
-                        act = null;
-                        ActiveStunEffect(true);
-                        StartCoroutine(CoroutineNameRevival);
-                    }
-                }
-            }
+            rb.gravityScale = 1.0f;
+            stun = true;
+            animator.enabled = false;
+            sr.sprite = stunS;
+            act = StunProcess;
+            ActiveStunEffect(true);
+            counter = 0;
         }
     }
+    
 
     public void FloatingProcess()
     {
@@ -93,6 +75,20 @@ public class Ittanmomen : Enemy
         tmp = vibrationCenter - (Vector2)transform.position;
         tmp.y *= 20f;
         rb.AddForce(tmp);
+    }
+
+    void StunProcess()
+    {
+        if (counter++ < 300 || isSealed)
+            return;
+
+        stun = false;
+        act = FloatingProcess;
+        rb.gravityScale = 0;
+        animator.enabled = true;
+        ActiveStunEffect(false);
+        Revival();
+        counter = 0;
     }
 
     //void Move()
@@ -118,7 +114,6 @@ public class Ittanmomen : Enemy
     {
         if (act == DriftingProcess && collision.gameObject.CompareTag("mikochan"))
         {
-
             rb.velocity = Vector2.zero;
             rb.AddForce((collision.gameObject.transform.position - transform.position) * 1.2f, ForceMode2D.Impulse);
             act = FloatingProcess;
@@ -130,17 +125,6 @@ public class Ittanmomen : Enemy
             rb.velocity = Vector2.zero;
         }
 
-    }
-
-    private IEnumerator RevivalCoroutine()
-    {
-        yield return GameSystem.Instance.FiveSecond;
-        stun = false;
-        act = FloatingProcess;
-        rb.gravityScale = 0;
-        _animator.enabled = true;
-        ActiveStunEffect(false);
-        Revival();
     }
 
     private IEnumerator DamageEffectCoroutine()

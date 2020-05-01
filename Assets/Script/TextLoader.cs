@@ -26,32 +26,33 @@ public class TextLoader : MonoBehaviour
     public void LoadText(string s, List<string> l)
     {
         ta = Resources.Load(s) as TextAsset;
-        if (ta != null)
-        {
-            string[] tmp = ta.text.Split(dels);
-            foreach (string str in tmp)
-            {
-                if (str != null)
-                {
-                    if (str.Length > 1 && str.Substring(0, 2) == columnBreak)
-                    {
-                        l.Add(sb.ToString());
-                        sb.Clear();
-                    }
-                    else
-                    {
-                        sb.Replace(rep, indention);
-                        sb.Append(str);
-                    }
-                }
-            }
+        if (ta == null)
+            return;
 
-            if (sb.Length != 0)
+        string[] tmp = ta.text.Split(dels);
+        foreach (string str in tmp)
+        {
+            if (str == null)
+                continue;
+
+            if (str.Length > 1 && str.Substring(0, 2) == columnBreak)
             {
                 l.Add(sb.ToString());
                 sb.Clear();
             }
-            ta = null;
+            else
+            {
+                sb.Replace(rep, indention);
+                sb.Append(str);
+            }
         }
+
+        if (sb.Length != 0)
+        {
+            l.Add(sb.ToString());
+            sb.Clear();
+        }
+        ta = null;
+
     }
 }

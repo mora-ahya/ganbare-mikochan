@@ -8,6 +8,11 @@ public class Mikochan : MonoBehaviour
 
     public static Mikochan Instance => mikoInstance;
 
+    readonly string animNameIsRun = "isRun";
+    readonly string animNameIsJump = "isJump";
+    readonly string animNameIsFall = "isFall";
+    readonly string animNameIsSquat = "isSquat";
+
     [SerializeField] Rigidbody2D rb = default;
     [SerializeField] Animator animator = default;
     [SerializeField] SpriteRenderer sr = default;
@@ -17,13 +22,14 @@ public class Mikochan : MonoBehaviour
     [SerializeField] Material damageEffect = default;
     [SerializeField] Material defaultM = default;
     [SerializeField] CameraManager cm = default;
-    [SerializeField] GameSystem gs = default;
     [SerializeField] GameObject kamisama = default;
     [SerializeField] MyPostEffects mpe = default;
 
-    readonly WaitForSeconds wait = new WaitForSeconds(0.08f);
-    WaitForSeconds knockBackTime = new WaitForSeconds(0.3f);
     Vector2 tmp = new Vector2();
+    Vector2 storedVelocity;
+    Vector2 knockBack = new Vector2(0, 3f);
+    Enemy target = null;
+    FunctionalStateMachine mode;
 
     readonly float jumpForce = 11f;
     readonly float jumpThreshold = 1.5f;
@@ -34,13 +40,15 @@ public class Mikochan : MonoBehaviour
     readonly float bcOffsetY = -0.31f;
     readonly float defaultSizeY = 0.58f;
     float kamisamaAreaSize = 3.0f;
-    float blessing = 1;
+    float blessing = 1f;
+    float knockBackDir = 10f;
     int kamiAttack = 1;
     int hp = 25;
     int maxHp = 25;
     int bonusHp = 0;
     int invincibleCount = 0;
-    int invincibleTime = 25;
+    int invincibleTime = 120;
+    int knockBackTime = 18;
     int key = 0;
     int exp = 0; //save対象
     bool isGround;
@@ -50,9 +58,19 @@ public class Mikochan : MonoBehaviour
     bool jump = false;
     bool stop = false;
     bool movie = false;
+    bool inTrap = false;
 
-    string state;
-    string prevState;
+    enum State
+    {
+        Idle,
+        Run,
+        Jump,
+        Fall,
+        Squat
+    }
+
+    State state;
+    State prevState;
 
     public bool Damaged {
         get
@@ -105,6 +123,18 @@ public class Mikochan : MonoBehaviour
         }
     }
 
+    public bool InTrap
+    {
+        get
+        {
+            return inTrap;
+        }
+        set
+        {
+            inTrap = value;
+        }
+    }
+
     public int HP => hp;
 
     public int MaxHP => maxHp + bonusHp;
@@ -112,6 +142,18 @@ public class Mikochan : MonoBehaviour
     public int Exp => exp;
 
     public int KamiAttack => kamiAttack;
+
+    public Enemy Target
+    {
+        get
+        {
+            return target;
+        }
+        set
+        {
+            target = value;
+        }
+    }
 
     void Awake()
     {
@@ -125,113 +167,98 @@ public class Mikochan : MonoBehaviour
         squat = false;
         invincibleCount = 0;
         kamiAttack = 1;
+        knockBack.x = knockBackDir;
+        mode = OperationalMode;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Act()
     {
-        //Debug.Log(state);
-        if (!GameSystem.Instance.Stop || stop)
-        {
-            if (!movie)
-            {
-                GetInputKey();
-            }
-            ChangeState();
-            ChangeAnimation();
-            cm.Set(transform.position.x, transform.position.y);
-        }
-        //Debug.Log(squat);
-        //rb.AddForce(transform.right * 10f);
-    }
-
-    void FixedUpdate()
-    {
-        Move();
+        mode();
     }
 
     void GetInputKey()
     {
         key = 0;
-        if (!damaged)
+        if (damaged)
+            return;
+
+        if (Input.GetKey(KeyCode.S) && isGround)
         {
-            if (Input.GetKey(KeyCode.S) && isGround)
+            squat = true;
+            if (cc.size.y == defaultSizeY)
             {
-                squat = true;
-                if (cc.size.y == defaultSizeY)
-                {
-                    tmp.x = cc.offset.x;
-                    tmp.y = squatOffsetY;
-                    cc.offset = tmp;
-                    cc2.offset = tmp;
-                    tmp.x = cc.size.x;
-                    tmp.y = squatSizeY;
-                    cc.size = tmp;
-                    cc2.size = tmp;
-                }
+                tmp.x = cc.offset.x;
+                tmp.y = squatOffsetY;
+                cc.offset = tmp;
+                cc2.offset = tmp;
+                tmp.x = cc.size.x;
+                tmp.y = squatSizeY;
+                cc.size = tmp;
+                cc2.size = tmp;
             }
-            else
+        }
+        else
+        {
+            squat = false;
+            if (cc.size.y == squatSizeY)
             {
-                squat = false;
-                if (cc.size.y == squatSizeY)
-                {
-                    tmp.x = cc.offset.x;
-                    tmp.y = -ccOffsetXY;
-                    cc.offset = tmp;
-                    cc2.offset = tmp;
-                    tmp.x = cc.size.x;
-                    tmp.y = defaultSizeY;
-                    cc.size = tmp;
-                    cc2.size = tmp;
-                }
+                tmp.x = cc.offset.x;
+                tmp.y = -ccOffsetXY;
+                cc.offset = tmp;
+                cc2.offset = tmp;
+                tmp.x = cc.size.x;
+                tmp.y = defaultSizeY;
+                cc.size = tmp;
+                cc2.size = tmp;
             }
+        }
 
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                cm.LookUnder(true);
-            }
-            else if (cm.GetLook)
-            {
-                cm.LookUnder(false);
-            }
-            //Debug.Log(squat);
-            if (!squat)
-            {
-                if (Input.GetKey(KeyCode.D))
-                {
-                    key = 1;
-                    sr.flipX = false;
-                    if (cc.offset.x < 0)
-                    {
-                        //Debug.Log(true);
-                        tmp.x = ccOffsetXY;
-                        tmp.y = -ccOffsetXY;
-                        cc.offset = tmp;
-                        cc2.offset = tmp;
-                        tmp.y = bcOffsetY;
-                        bc.offset = tmp;
-                    }
-                }
-                if (Input.GetKey(KeyCode.A))
-                {
-                    key = -1;
-                    sr.flipX = true;
-                    if (cc.offset.x > 0)
-                    {
-                        //Debug.Log(true);
-                        tmp.x = -ccOffsetXY;
-                        tmp.y = -ccOffsetXY;
-                        cc.offset = tmp;
-                        cc2.offset = tmp;
-                        tmp.y = bcOffsetY;
-                        bc.offset = tmp;
-                    }
-                }
-            }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            cm.LookUnder(true);
+        }
+        else if (cm.GetLook)
+        {
+            cm.LookUnder(false);
+        }
+        //Debug.Log(squat);
+        if (Input.GetKeyDown(KeyCode.W) && isGround)
+        {
+            jump = true;
+        }
 
-            if (Input.GetKeyDown(KeyCode.W) && isGround)
+        if (squat)
+            return;
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            key = 1;
+            sr.flipX = false;
+            if (cc.offset.x < 0)
             {
-                jump = true;
+                //Debug.Log(true);
+                tmp.x = ccOffsetXY;
+                tmp.y = -ccOffsetXY;
+                cc.offset = tmp;
+                cc2.offset = tmp;
+                tmp.y = bcOffsetY;
+                bc.offset = tmp;
+            }
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            key = -1;
+            sr.flipX = true;
+            if (cc.offset.x > 0)
+            {
+                //Debug.Log(true);
+                tmp.x = -ccOffsetXY;
+                tmp.y = -ccOffsetXY;
+                cc.offset = tmp;
+                cc2.offset = tmp;
+                tmp.y = bcOffsetY;
+                bc.offset = tmp;
             }
         }
     }
@@ -247,92 +274,146 @@ public class Mikochan : MonoBehaviour
         {
             if (squat)
             {
-                state = "SQUAT";
+                state = State.Squat;
+                return;
+            }
+
+            if (key != 0)
+            {
+                state = State.Run;
             }
             else
             {
-                if (key != 0)
-                {
-                    state = "RUN";
-                }
-                else
-                {
-                    state = "IDLE";
-                }
+                state = State.Idle;
             }
+            return;
         }
-        else
+
+        if (rb.velocity.y > 0)
         {
-            if (rb.velocity.y > 0)
-            {
-                state = "JUMP";
-            }
-            else if(rb.velocity.y < 0)
-            {
-                state = "FALL";
-            }
+            state = State.Jump;
+        }
+        else if (rb.velocity.y < 0)
+        {
+            state = State.Fall;
         }
     }
 
     void ChangeAnimation()
     {
-        if (prevState != state)
+        if (prevState == state)
+            return;
+
+        switch (state)
         {
-            switch(state)
-            {
-                case "JUMP":
-                    animator.SetBool("isRun", false);
-                    animator.SetBool("isFall", false);
-                    animator.SetBool("isJump", true);
-                    animator.SetBool("isSquat", false);
-                    break;
-                case "FALL":
-                    animator.SetBool("isRun", false);
-                    animator.SetBool("isFall", true);
-                    animator.SetBool("isJump", false);
-                    animator.SetBool("isSquat", false);
-                    break;
-                case "RUN":
-                    animator.SetBool("isRun", true);
-                    animator.SetBool("isFall", false);
-                    animator.SetBool("isJump", false);
-                    animator.SetBool("isSquat", false);
-                    break;
-                case "SQUAT":
-                    animator.SetBool("isRun", false);
-                    animator.SetBool("isFall", false);
-                    animator.SetBool("isJump", false);
-                    animator.SetBool("isSquat", true);
-                    break;
-                default:
-                    animator.SetBool("isRun", false);
-                    animator.SetBool("isFall", false);
-                    animator.SetBool("isJump", false);
-                    animator.SetBool("isSquat", false);
-                    break;
-            }
-            prevState = state;
+            case State.Jump:
+                animator.SetBool(animNameIsRun, false);
+                animator.SetBool(animNameIsFall, false);
+                animator.SetBool(animNameIsJump, true);
+                animator.SetBool(animNameIsSquat, false);
+                break;
+            case State.Fall:
+                animator.SetBool(animNameIsRun, false);
+                animator.SetBool(animNameIsFall, true);
+                animator.SetBool(animNameIsJump, false);
+                animator.SetBool(animNameIsSquat, false);
+                break;
+            case State.Run:
+                animator.SetBool(animNameIsRun, true);
+                animator.SetBool(animNameIsFall, false);
+                animator.SetBool(animNameIsJump, false);
+                animator.SetBool(animNameIsSquat, false);
+                break;
+            case State.Squat:
+                animator.SetBool(animNameIsRun, false);
+                animator.SetBool(animNameIsFall, false);
+                animator.SetBool(animNameIsJump, false);
+                animator.SetBool(animNameIsSquat, true);
+                break;
+            default:
+                animator.SetBool(animNameIsRun, false);
+                animator.SetBool(animNameIsFall, false);
+                animator.SetBool(animNameIsJump, false);
+                animator.SetBool(animNameIsSquat, false);
+                break;
         }
+        prevState = state;
+
     }
 
     void Move()
     {
-        if (!damaged)
+        if (damaged)
+            return;
+
+        tmp.Set(runSpeed * key, rb.velocity.y);
+        rb.velocity = tmp;
+        if (isGround && jump)
         {
-            rb.velocity = new Vector2(runSpeed * key, rb.velocity.y);
-            if (isGround && jump)
-            {
-                rb.AddForce(transform.up * jumpForce, ForceMode2D.Impulse);
-                isGround = false;
-                jump = false;
-            }
+            tmp = transform.up;
+            tmp *= jumpForce;
+            rb.AddForce(tmp, ForceMode2D.Impulse);
+            isGround = false;
+            jump = false;
         }
-        //rb.velocity = new Vector2(runSpeed * key, rb.velocity.y);
     }
 
-    public void DoIEnumerator(string coroutineName)
+    public void JumpCommand()
     {
-        StartCoroutine(coroutineName);
+        jump = true;
+    }
+
+    public void SquatCommand()
+    {
+        squat = true;
+        if (cc.size.y == defaultSizeY)
+        {
+            tmp.x = cc.offset.x;
+            tmp.y = squatOffsetY;
+            cc.offset = tmp;
+            cc2.offset = tmp;
+            tmp.x = cc.size.x;
+            tmp.y = squatSizeY;
+            cc.size = tmp;
+            cc2.size = tmp;
+        }
+    }
+
+    public void StandUpCommand()
+    {
+        squat = false;
+        if (cc.size.y == squatSizeY)
+        {
+            tmp.x = cc.offset.x;
+            tmp.y = -ccOffsetXY;
+            cc.offset = tmp;
+            cc2.offset = tmp;
+            tmp.x = cc.size.x;
+            tmp.y = defaultSizeY;
+            cc.size = tmp;
+            cc2.size = tmp;
+        }
+    }
+
+    public void RunCommand(int k)
+    {
+        key = k > 0 ? 1 : -1;
+        sr.flipX = key == -1;
+        if (cc.offset.x * key < 0)
+        {
+            //Debug.Log(true);
+            tmp.x = key * ccOffsetXY;
+            tmp.y = -ccOffsetXY;
+            cc.offset = tmp;
+            cc2.offset = tmp;
+            tmp.y = bcOffsetY;
+            bc.offset = tmp;
+        }
+    }
+
+    public void StopCommand()
+    {
+        key = 0;
     }
 
     public void IncreaseMikochanHP(int amount)
@@ -363,7 +444,7 @@ public class Mikochan : MonoBehaviour
         StatusManager.Instance.updateHP();
         if (hp <= 0)
         {
-            gs.GameOver();
+            GameSystem.Instance.GameOver();
         }
     }
 
@@ -385,11 +466,6 @@ public class Mikochan : MonoBehaviour
     public void TrapDamage(float per)
     {
         ChangeHp(-(int)Mathf.Ceil(maxHp * per));
-    }
-
-    public void SetKey(int k)
-    {
-        key = k;
     }
 
     public void Special(int specialNum)
@@ -428,20 +504,125 @@ public class Mikochan : MonoBehaviour
                 kamiAttack += 2;
                 break;
             case 11:
-                knockBackTime = new WaitForSeconds(0.2f);
+                knockBackTime = 30;
                 break;
             case 12:
                 break;
             case 13:
-                invincibleTime = 49;
+                invincibleTime = 180;
                 break;
             case 14:
                 blessing -= 0.3f;
                 break;
             case 15:
-                knockBackTime = new WaitForSeconds(0.1f);
+                knockBackTime = 18;
                 break;
         }
+    }
+
+    void EnemyDamage()
+    {
+        if (target == null || target.Stun || damaged || invincible)
+            return;
+
+        rb.velocity = Vector2.zero;
+        ChangeHp(-target.Attack);
+        knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
+        rb.AddForce(knockBack, ForceMode2D.Impulse);
+        invincible = true;
+        damaged = true;
+        sr.material = damageEffect;
+    }
+
+    void SealingEnemy()
+    {
+        if (target == null || !squat || !target.Stun)
+            return;
+
+        /*
+        GetExp(target.Exp);
+        target.ResetPos();
+        target.gameObject.SetActive(false);
+        target.ResetFlag = true;
+        */
+        target.IsSealed = true;
+        target.Sealed();
+        target = null;
+    }
+
+    void TrapDamage()
+    {
+        if (!inTrap || damaged || invincible)
+            return;
+
+        rb.velocity = Vector2.zero;
+        TrapDamage(0.05f);
+        knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
+        rb.AddForce(knockBack, ForceMode2D.Impulse);
+        invincible = true;
+        damaged = true;
+        sr.material = damageEffect;
+    }
+
+    void OperationalMode()
+    {
+        if (GameSystem.Instance.Stop)
+            return;
+
+        GetInputKey();
+        ChangeState();
+        ChangeAnimation();
+        cm.Set(transform.position.x, transform.position.y);
+
+        Move();
+        EnemyDamage();
+        SealingEnemy();
+        TrapDamage();
+        InvincibleProcess();
+    }
+
+    void AutoMode()
+    {
+        ChangeState();
+        ChangeAnimation();
+        cm.Set(transform.position.x, transform.position.y);
+        Move();
+    }
+
+    public void ChangeAuto()
+    {
+        mode = AutoMode;
+    }
+
+    public void ChangeOperational()
+    {
+        mode = OperationalMode;
+    }
+
+    public void Pause()
+    {
+        StorePhysic();
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0f;
+    }
+
+    public void Restart()
+    {
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 2f;
+        RestorePhysic();
+    }
+
+    public void StorePhysic()
+    {
+        storedVelocity = rb.velocity;
+        //rb.velocity = Vector2.zero;
+    }
+
+    public void RestorePhysic()
+    {
+        rb.velocity = storedVelocity;
+        storedVelocity = Vector2.zero;
     }
     /*//テスト実装
     public void TimeStop()
@@ -451,30 +632,30 @@ public class Mikochan : MonoBehaviour
     }
     */
 
-    IEnumerator Inv()
+    void InvincibleProcess()
     {
-        sr.material = damageEffect;
-        yield return null;
-        yield return null;
-        yield return null;
-        sr.material = defaultM;
-        while (invincibleCount <= invincibleTime)
+        if (!invincible)
+            return;
+
+        if (invincibleCount == knockBackTime)
         {
-            sr.enabled = !sr.enabled;
-            //sr.color = Color.clear;
-            //Debug.Log(true);
-            yield return wait;
-            invincibleCount++;
+            damaged = false;
         }
+
+        if (invincibleCount == 10)
+            sr.material = defaultM;
+
+        if (invincibleCount % 8 == 0)
+            sr.enabled = !sr.enabled;
+
+        if (invincibleCount++ <= invincibleTime)
+            return;
+
+        sr.material = defaultM;
         invincible = false;
         invincibleCount = 0;
     }
 
-    IEnumerator KnockBack()
-    {
-        yield return knockBackTime;
-        damaged = false;
-    }
     /*//テスト実装
     IEnumerator TimeStopCroutine()
     {

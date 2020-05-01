@@ -8,16 +8,22 @@ public class Treasure : MonoBehaviour
     [SerializeField] SpriteRenderer sr = default;
     [SerializeField] Sprite s = default;
     [SerializeField] int amount = default;
+    //[SerializeField] Item content = default; //内容物数字
 
     bool canOpen = false;
     bool empty = false;
 
-    void Update()
+    public void Set()
+    {
+
+    }
+
+    public void Act()
     {
         if (!canOpen || empty)
             return;
 
-        if (cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)) && Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
         {
 
             empty = true;
@@ -29,7 +35,7 @@ public class Treasure : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag(Mikochan.Instance.tag))
         {
@@ -37,7 +43,7 @@ public class Treasure : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag(Mikochan.Instance.tag))
         {

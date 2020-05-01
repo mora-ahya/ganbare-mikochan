@@ -12,13 +12,10 @@ public class GashaShot : Enemy
     [SerializeField] CircleCollider2D cc = default;
 
     float v = 1.0f;
-    Mikochan miko;
-    Action act;
 
-    // Start is called before the first frame update
-    void Start()
+    public override void Set()
     {
-        miko = Mikochan.Instance;
+        
     }
 
     public void Set(float sv, int maxhp)
@@ -34,12 +31,12 @@ public class GashaShot : Enemy
         v = sv;
     }
 
-    // Update is called once per frame
+    /*
     void Update()
     {
         MouseEvent();
         act?.Invoke();
-    }
+    }*/
 
     public override void Act()
     {
@@ -50,7 +47,7 @@ public class GashaShot : Enemy
     void DecideDir()
     {
         rb.velocity = Vector2.zero;
-        rb.AddForce((miko.transform.position - transform.position).normalized * v, ForceMode2D.Impulse);
+        rb.AddForce((Mikochan.Instance.transform.position - transform.position).normalized * v, ForceMode2D.Impulse);
     }
 
     void MouseEvent()
@@ -59,7 +56,7 @@ public class GashaShot : Enemy
             return;
 
         stun = true;
-        Damage(miko.KamiAttack);
+        Damage(Mikochan.Instance.KamiAttack);
         rb.velocity *= -4;
         StartCoroutine(CoroutineNameDamageEffect);
         if (hp > 0)

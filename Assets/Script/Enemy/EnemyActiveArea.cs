@@ -10,7 +10,7 @@ public class EnemyActiveArea : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag(targetTag) || self.gameObject.activeSelf)
+        if (!collision.CompareTag(targetTag) || self.gameObject.activeSelf || self.IsSealed)
             return;
 
         self.gameObject.SetActive(true);
@@ -20,7 +20,7 @@ public class EnemyActiveArea : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        if (!collision.CompareTag(targetTag) || !self.gameObject.activeSelf)
+        if (!collision.CompareTag(targetTag) || !self.gameObject.activeSelf || self.IsSealed)
             return;
 
         if (self.Stun)

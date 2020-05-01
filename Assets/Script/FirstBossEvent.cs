@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class FirstBossEvent : MonoBehaviour
 {
+    [SerializeField] GameObject invisibleWall = default;
     [SerializeField] GameObject gasha = default;
     [SerializeField] BoxCollider2D bc = default;
 
@@ -13,9 +14,12 @@ public class FirstBossEvent : MonoBehaviour
         if (collision.transform.CompareTag("mikochan"))
         {
             gasha.SetActive(true);
+            invisibleWall.SetActive(true);
+            TrainingSceneManager.Instance.IsOperational = false;
             CameraManager.Instance.FixedCamera(true);
             bc.enabled = false;
         }
+        
     }
 
     public void BeatenBoss()

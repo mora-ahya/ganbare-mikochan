@@ -11,15 +11,12 @@ public class Hitotsumekozou : Enemy
     static readonly string AnimBoolIsRun = "isRun";
     static readonly string AnimBoolIsStumble = "isStumble";
 
-    [SerializeField] Animator animator = default;
     [SerializeField] CapsuleCollider2D cc = default;
     [SerializeField] CapsuleCollider2D hitArea = default;
     [SerializeField] Sprite stunSprite = default;
 
     Vector3 tmp;
     int dir = -1;
-    int counter = 0;
-    Action act = null;
 
     public override void Set()
     {
@@ -36,38 +33,28 @@ public class Hitotsumekozou : Enemy
         if (!resetFlag)
             return;
         
-        stun = false;
-        inRange = false;
         animator.enabled = true;
-        Revival();
-        ResetMaterial();
-        ActiveStunEffect(false);
-        resetFlag = false;
-    } 
+        base.Set();
+    }
 
     public override void Act()
     {
-        if (!stun)
-        {
-            MouseEvent();
-            act?.Invoke();
-        }
+        MouseEvent();
+        act();
         hitArea.transform.position = transform.position;
         SetActiveAreaPosition();
     }
 
     void SearchingProcess()
     {
-        if (counter == 90)
-        {
-            counter = 0;
-            dir *= -1;
-            tmp = gameObject.transform.localScale;
-            tmp.x *= -1;
-            gameObject.transform.localScale = tmp;
+        if (counter++ != 90)
             return;
-        }
-        counter++;
+
+        counter = 0;
+        dir *= -1;
+        tmp = gameObject.transform.localScale;
+        tmp.x *= -1;
+        gameObject.transform.localScale = tmp;
     }
 
     void RunningProcess()
@@ -101,7 +88,6 @@ public class Hitotsumekozou : Enemy
         }
 
         rb.AddForce(transform.right * -dir * 6);
-
     }
 
     void LyingProcess()
@@ -114,7 +100,7 @@ public class Hitotsumekozou : Enemy
             ActiveStunEffect(true);
             sr.sprite = stunSprite;
             animator.enabled = false;
-            act = null;
+            act = StunProcess;
             counter = 0;
             return;
         }
@@ -134,29 +120,42 @@ public class Hitotsumekozou : Enemy
         }
     }
 
+    void StunProcess()
+    {
+        if (counter++ < 300 || isSealed)
+            return;
+
+        stun = false;
+        counter = 0;
+        act = SearchingProcess;
+        animator.enabled = true;
+        animator.SetBool(AnimBoolIsRun, false);
+        animator.SetBool(AnimBoolIsStumble, false);
+        ChangeTriggerDir(false);
+        ActiveStunEffect(false);
+        Revival();
+    }
+
     void MouseEvent()
     {
-        if (!invincible && inRange && Input.GetMouseButtonDown(0))
+        if (stun || invincible || !inRange || !Input.GetMouseButtonDown(0) || !hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+            return;
+
+        if (GameSystem.Instance.Stop)
+            return;
+
+        StartCoroutine(CoroutineNameDamageEffect);
+        Damage(Mikochan.Instance.KamiAttack);
+        if (hp <= 0 && act != StumblingProcess)
         {
-            if (hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
-            {
-                if (!GameSystem.Instance.Stop)
-                {
-                    StartCoroutine(CoroutineNameDamageEffect);
-                    Damage(Mikochan.Instance.KamiAttack);
-                    if (hp <= 0 && act != StumblingProcess)
-                    {
-                        ChangeTriggerDir(true);
-                        act = null;
-                        rb.velocity = Vector3.zero;
-                        stun = true;
-                        ActiveStunEffect(true);
-                        sr.sprite = stunSprite;
-                        animator.enabled = false;
-                        StartCoroutine(CoroutineNameRevival);
-                    }
-                }
-            }
+            ChangeTriggerDir(true);
+            act = StunProcess;
+            counter = 0;
+            rb.velocity = Vector3.zero;
+            stun = true;
+            ActiveStunEffect(true);
+            sr.sprite = stunSprite;
+            animator.enabled = false;
         }
     }
 
@@ -198,20 +197,6 @@ public class Hitotsumekozou : Enemy
             act = RunningProcess;
             animator.SetBool(AnimBoolIsRun, true);
         }
-    }
-
-    IEnumerator RevivalCoroutine()
-    {
-        yield return GameSystem.Instance.FiveSecond;
-        stun = false;
-        counter = 0;
-        act = SearchingProcess;
-        animator.enabled = true;
-        animator.SetBool(AnimBoolIsRun, false);
-        animator.SetBool(AnimBoolIsStumble, false);
-        ChangeTriggerDir(false);
-        ActiveStunEffect(false);
-        Revival();
     }
 
     IEnumerator DamageEffectCoroutine()

@@ -8,6 +8,8 @@ public class StatusManager : MonoBehaviour
     static StatusManager statusManagerInstance;
     public static StatusManager Instance => statusManagerInstance;
 
+    public GameObject ExpImage = default;
+
     [SerializeField] Slider hpBar = default;
     [SerializeField] Text hpText = default;
     [SerializeField] Text expText = default;

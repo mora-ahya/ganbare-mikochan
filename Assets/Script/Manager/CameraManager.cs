@@ -7,6 +7,8 @@ public class CameraManager : MonoBehaviour
     static CameraManager cameraManagerInstance;
     public static CameraManager Instance => cameraManagerInstance;
 
+    readonly float cameraHalfWidth = 8f;
+
     [SerializeField] float stageRight = 190;
     [SerializeField] float stageLeft = -7;
     float minDifY = -2.0f;
@@ -87,14 +89,22 @@ public class CameraManager : MonoBehaviour
         ProcessLook();
         tmp.y += dif.y;
         if (tmp.x < stageLeft)
-        {
             tmp.x = stageLeft;
-        }
+        
+        if (tmp.x > stageRight)
+            tmp.x = stageRight;
+
         transform.position = tmp;
         if (backView != null)
             ProcessView();
 
         postCamera.transform.position = transform.position;
+    }
+
+    public void SetStageSide(float left, float right)
+    {
+        stageLeft = left + cameraHalfWidth;
+        stageRight = right - cameraHalfWidth;
     }
 
     public void Shake(bool value)

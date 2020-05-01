@@ -84,27 +84,25 @@ public class TrainingSceneManager : MonoBehaviour
 
     public void DisplayTrainingScene()
     {
-        if (isOperational)
+        if (!isOperational)
+            return;
+
+        if (GameSystem.Instance.Stop)
         {
-            if (GameSystem.Instance.Stop)
+            CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, false);
+            GameSystem.Instance.GameRestart();
+            if (isRunning)
             {
-                CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, false);
-                GameSystem.Instance.Stop = false;
-                Time.timeScale = 1.0f;
-                if (isRunning)
-                {
-                    ParticleOff();
-                }
-                gameObject.SetActive(false);
+                ParticleOff();
             }
-            else
-            {
-                CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, true);
-                GameSystem.Instance.Stop = true;
-                Time.timeScale = 0;
-                gameObject.SetActive(true);
-            }
+            gameObject.SetActive(false);
+            return;
         }
+
+        CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, true);
+        GameSystem.Instance.GameStop();
+        gameObject.SetActive(true);
+
     }
 
     void IncreaseNecessaryExp()

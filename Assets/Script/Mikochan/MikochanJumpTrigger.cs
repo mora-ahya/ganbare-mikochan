@@ -4,23 +4,16 @@ using UnityEngine;
 
 public class MikochanJumpTrigger : MonoBehaviour
 {
-    Mikochan mikochan;
-    // Start is called before the first frame update
-    void Start()
-    {
-        mikochan = Mikochan.Instance;
-    }
-
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Ground" && !mikochan.IsGround)
-            mikochan.IsGround = true;
+        if (other.gameObject.tag == "Ground" && !Mikochan.Instance.IsGround)
+            Mikochan.Instance.IsGround = true;
 
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Ground" && !mikochan.IsGround)
-            mikochan.IsGround = true;
+        if (other.gameObject.tag == "Ground" && !Mikochan.Instance.IsGround)
+            Mikochan.Instance.IsGround = true;
     }
 }

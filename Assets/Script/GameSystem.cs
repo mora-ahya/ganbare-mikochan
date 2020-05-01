@@ -4,8 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+public delegate void FunctionalStateMachine();
+
 public class GameSystem : MonoBehaviour
 {
+    /* Saveデータ形式
+     * 宝箱情報...unsigned intのビット演算式
+     * みこちゃん...各スキルLv、経験値、アイテム所持数
+     * 進行度...クリアしたエリア数
+    */
+
     static GameSystem gameSystemInstance;
     public static GameSystem Instance => gameSystemInstance;
 
@@ -19,8 +27,8 @@ public class GameSystem : MonoBehaviour
 
     bool movie;
 
-    [SerializeField] Mikochan mikochan = default;
-    //[SerializeField] HowlManager hm = default;
+    FunctionalStateMachine scene;
+
     [SerializeField] CircleGrayScaleEffect cgse = default;
     [SerializeField] Image darkness = default;
     [SerializeField] Image whiteness = default;
@@ -42,6 +50,7 @@ public class GameSystem : MonoBehaviour
     {
         darkness.CrossFadeAlpha(0, 0, true);
         darkness.gameObject.SetActive(true);
+        TrainingSceneManager.Instance.IsOperational = true;
         Stop = false;
     }
 
@@ -77,20 +86,37 @@ public class GameSystem : MonoBehaviour
             }
         }
         */
-        //Debug.Log(Input.mousePosition);
-        StageManager.Instance.Act();
+        Mikochan.Instance.Act();
+        AreaManager.Instance.Act();
+        EventTextManager.Instance.Act();
+    }
+    
+    void AreaScene()
+    {
+        Mikochan.Instance.Act();
+        AreaManager.Instance.Act();
+        EventTextManager.Instance.Act();
+    }
+
+    void AreaSelectScene()
+    {
+
     }
 
     public void GameStop()
     {
+        AreaManager.Instance.StopEnemy();
+        Mikochan.Instance.Pause();
         Stop = true;
-        Time.timeScale = 0;
+        //Time.timeScale = 0;
     }
 
     public void GameRestart()
     {
+        AreaManager.Instance.RestartEnemy();
+        Mikochan.Instance.Restart();
         Stop = false;
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
     }
 
     public void GameOver()
@@ -98,7 +124,6 @@ public class GameSystem : MonoBehaviour
         TrainingSceneManager.Instance.IsOperational = false;
         IsGameOver = true;
         StartCoroutine("ToResult");
-        Time.timeScale = 0;
     }
 
     public void GameClear()

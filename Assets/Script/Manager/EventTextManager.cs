@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class EventTextManager : MonoBehaviour
 {
-    private static EventTextManager etmInstance;
+    private static EventTextManager EventTextManagerInstance;
 
-    public static EventTextManager Instance => etmInstance;
+    public static EventTextManager Instance => EventTextManagerInstance;
 
     readonly string[] escapeSecences = { "$", ":" };
-    readonly string[] triggerString = {"$name", "$wait"};
+    readonly string[] triggerString = {"$name", "$wait", "$stay"};
 
     [SerializeField] Text mainText = default;
     [SerializeField] Text nameText = default;
@@ -18,28 +18,39 @@ public class EventTextManager : MonoBehaviour
     List<string> multipleText = null;
     int indexNum = 0;
     int displayNum = 0;
+    int counter = 0;
+    bool isStayed = false;
     string[] splitted;
-    public int displaySpeed = 1;
+    public int displaySpeed = 3;
     WaitForSeconds wait;
-    //public bool pause;
+
+    public bool IsStayed
+    {
+        get
+        {
+            return isStayed;
+        }
+
+        set
+        {
+            isStayed = value;
+        }
+    }
+    
 
     void Awake()
     {
-        etmInstance = this;
+        EventTextManagerInstance = this;
         mainText.text = null;
         nameText.text = null;
         gameObject.SetActive(false);
     }
 
-    void Start()
+    public void Act()
     {
-        //mainText.text = null;
-        //gameObject.SetActive(false);
-    }
+        if (!gameObject.activeSelf)
+            return;
 
-    // Update is called once per frame
-    void Update()
-    {
         if (multipleText != null)
         {
             MultipleText();
@@ -71,7 +82,7 @@ public class EventTextManager : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void SingleText()
+    void SingleText()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -79,8 +90,11 @@ public class EventTextManager : MonoBehaviour
         }
     }
 
-    private void MultipleText()
+    void MultipleText()
     {
+        if (isStayed)
+            return;
+
         if (multipleText.Count > indexNum)
         {
             if (multipleText[indexNum].Length > 0 && multipleText[indexNum].Substring(0, 1) == escapeSecences[0])
@@ -89,9 +103,14 @@ public class EventTextManager : MonoBehaviour
                 indexNum++;
                 return;
             }
+
             if (multipleText[indexNum].Length >= displayNum)
             {
-                mainText.text = multipleText[indexNum].Substring(0, displayNum++);
+                if (counter++ == displaySpeed)
+                {
+                    mainText.text = multipleText[indexNum].Substring(0, displayNum++);
+                    counter = 0;
+                }
 
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -102,20 +121,20 @@ public class EventTextManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0))
+            return;
+
+        if (multipleText.Count <= indexNum + 1)
         {
-            if (multipleText.Count <= indexNum + 1)
-            {
-                Release();
-                multipleText = null;
-                indexNum = 0;
-                displayNum = 0;
-            }
-            else
-            {
-                indexNum++;
-                displayNum = 0;
-            }
+            Release();
+            multipleText = null;
+            indexNum = 0;
+            displayNum = 0;
+        }
+        else
+        {
+            indexNum++;
+            displayNum = 0;
         }
     }
 
@@ -131,23 +150,32 @@ public class EventTextManager : MonoBehaviour
         if (splitted[0] == triggerString[1])
         {
             gameObject.SetActive(false);
+            mainText.text = null;
+            return;
+        }
+
+        if (splitted[0] == triggerString[2])
+        {
+            isStayed = true;
             return;
         }
     }
 
-    private void Lock()
+    void Lock()
     {
-        GameSystem.Instance.Stop = true;
+        //GameSystem.Instance.Stop = true;
+        GameSystem.Instance.GameStop();
         TrainingSceneManager.Instance.IsOperational = false;
-        Time.timeScale = 0;
+        //Time.timeScale = 0;
         gameObject.SetActive(true);
     }
 
-    private void Release()
+    void Release()
     {
-        GameSystem.Instance.Stop = false;
+        //GameSystem.Instance.Stop = false;
+        GameSystem.Instance.GameRestart();
         TrainingSceneManager.Instance.IsOperational = true;
-        Time.timeScale = 1;
+        //Time.timeScale = 1;
         nameText.text = null;
         mainText.text = null;
         gameObject.SetActive(false);

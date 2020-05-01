@@ -24,13 +24,10 @@ public class Gashadokuro : Enemy
     [SerializeField] GashaShot[] gashaShots = default;
     [SerializeField] BoxCollider2D handR = default;
     [SerializeField] BoxCollider2D handL = default;
-    [SerializeField] Animator animator = default;
     [SerializeField] Transform mouseTrans = default;
-    [SerializeField] CameraManager cm = default;
     [SerializeField] FirstBossEvent fbe = default;
     WaitForSeconds wait = new WaitForSeconds(2f);//ダメージごとに短く
     AnimatorStateInfo anim;
-    Action act;
     int swingCount = 0;
     int shotInterval = 2;
     int shotHP = 3;
@@ -64,13 +61,12 @@ public class Gashadokuro : Enemy
     void Start()
     {
         defaultPosX = transform.position.x;
-        cm = CameraManager.Instance;
         HandCollider(false);
         wait = GameSystem.Instance.TwoSecond;
         act = AppearanceProcess;
     }
 
-    // Update is called once per frame
+    /*
     void Update()
     {
         //switch (state)
@@ -200,14 +196,19 @@ public class Gashadokuro : Enemy
         //        }
         //        break;
         //}
-        Process();
-        Move();
-        MakeShot();
+        Act();
+    }*/
+
+    public override void Set()
+    {
+        
     }
 
-    void Process()
+    public override void Act()
     {
         act?.Invoke();
+        Move();
+        MakeShot();
     }
 
     void AppearanceProcess()
@@ -215,8 +216,8 @@ public class Gashadokuro : Enemy
         if (runCoroutine)
             return;
 
-        if (!cm.GetShake)
-            cm.Shake(true);
+        if (!CameraManager.Instance.GetShake)
+            CameraManager.Instance.Shake(true);
         
 
         anim = animator.GetCurrentAnimatorStateInfo(0);
@@ -224,23 +225,24 @@ public class Gashadokuro : Enemy
         {
             HandCollider(true);
             runCoroutine = true;
-            cm.Shake(false);
+            CameraManager.Instance.Shake(false);
             StartCoroutine(Cooltime());
+            TrainingSceneManager.Instance.IsOperational = true;
             return;
         }
 
         if (anim.IsName(animNameLaugh) && !HowlManager.Instance.gameObject.activeSelf)
         {
-            if (!cm.GetShake)
+            if (!CameraManager.Instance.GetShake)
             {
-                cm.Shake(true);
+                CameraManager.Instance.Shake(true);
             }
             HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
             return;
         }
 
-        if (cm.GetShake && anim.IsName(animNameAppearance) && anim.normalizedTime > 1)
-            cm.Shake(false);
+        if (CameraManager.Instance.GetShake && anim.IsName(animNameAppearance) && anim.normalizedTime > 1)
+            CameraManager.Instance.Shake(false);
     }
 
     void SprinkleProcess()
