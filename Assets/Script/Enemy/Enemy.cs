@@ -27,20 +27,18 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected Shinryoku shinryoku = default;
     [SerializeField] protected Animator animator = default;
 
-    Vector2 storedVelocity;
-    bool isInit = true;
-
-    protected Vector3 initSize;
-
-    protected Material whiteOutMaterial = null;
-
     protected bool stun = false;
     protected bool inRange = false;
     protected bool resetFlag = false;
     protected bool isSealed = false;
     protected int counter = 0;
-    float whiteDegree = 0;
     protected FunctionalStateMachine act;
+    protected Vector3 initSize;
+    protected Material whiteOutMaterial = null;
+
+    Vector2 storedVelocity;
+    bool isInit = true;
+    float whiteDegree = 0;
 
     public int Attack => attack;
 
@@ -255,6 +253,9 @@ public class Enemy : MonoBehaviour
 
         if (animator != null)
             animator.SetFloat(AnimFloatGameSpeed, 0f);
+
+        if (shinryoku.gameObject.activeSelf)
+            shinryoku.Pause();
     }
 
     public virtual void Restart()
@@ -267,6 +268,9 @@ public class Enemy : MonoBehaviour
 
         if (animator != null)
             animator.SetFloat(AnimFloatGameSpeed, 1f);
+
+        if (shinryoku.gameObject.activeSelf)
+            shinryoku.Restart();
     }
 
     public virtual void StorePhysic()

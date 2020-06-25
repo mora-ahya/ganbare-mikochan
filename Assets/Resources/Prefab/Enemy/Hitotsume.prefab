@@ -385,6 +385,7 @@ MonoBehaviour:
   animator: {fileID: 1461822450452852923}
   cc: {fileID: 1461822450452852896}
   hitArea: {fileID: 1461822452103005202}
+  bc: {fileID: 1461822451304779126}
   stunSprite: {fileID: 21300018, guid: 58eb5bbe4935ab94495a7ea084bdd0bc, type: 3}
 --- !u!70 &1461822450452852896
 CapsuleCollider2D:

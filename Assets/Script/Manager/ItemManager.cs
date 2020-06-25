@@ -7,6 +7,8 @@ public class ItemManager : MonoBehaviour
     static ItemManager ItemManagerInstance;
     public static ItemManager Instance => ItemManagerInstance;
 
+    public readonly int PurifiedWaterID = 0;
+
     [SerializeField]Item[] items = default;
 
     void Awake()
@@ -14,7 +16,7 @@ public class ItemManager : MonoBehaviour
         ItemManagerInstance = this;
     }
 
-    public Item GetItem(int itemID)
+    public Item GetItemInfo(int itemID)
     {
         return items[itemID];
     } 

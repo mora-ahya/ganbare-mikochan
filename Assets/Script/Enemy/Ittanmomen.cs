@@ -79,6 +79,12 @@ public class Ittanmomen : Enemy
 
     void StunProcess()
     {
+        if (Mathf.Abs(rb.velocity.x) >= 0.01f)
+        {
+            tmp.Set(0f, rb.velocity.y);
+            rb.velocity = tmp;
+        }
+
         if (counter++ < 300 || isSealed)
             return;
 

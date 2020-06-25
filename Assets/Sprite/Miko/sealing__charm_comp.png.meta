@@ -1,15 +1,12 @@
 fileFormatVersion: 2
-guid: 203a955e7eecafd469d14b6873ffcc0f
+guid: cd8e7a6c13dc9894a8933a375edf1402
 TextureImporter:
   fileIDToRecycleName:
-    21300000: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_0"
-    21300002: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_1"
-    21300004: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_2"
-    21300006: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_3"
-    21300008: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_4"
-    21300010: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_5"
-    21300012: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_6"
-    21300014: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_7"
+    21300000: sealing__charm_comp_0
+    21300002: sealing__charm_comp_1
+    21300004: sealing__charm_comp_2
+    21300006: sealing__charm_comp_3
+    21300008: sealing__charm_comp_4
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -70,7 +67,7 @@ TextureImporter:
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: -1
+    textureFormat: 4
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -81,7 +78,7 @@ TextureImporter:
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: -1
+    textureFormat: 4
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -92,7 +89,7 @@ TextureImporter:
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: -1
+    textureFormat: 4
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
@@ -103,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_0"
+      name: sealing__charm_comp_0
       rect:
         serializedVersion: 2
-        x: 269
-        y: 2209
-        width: 127
-        height: 167
+        x: 0
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -117,19 +114,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ffd28e70974047448a4b79c6d0d27c95
+      spriteID: afe6e357531b6a141a71a5ece1bc840d
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_1"
+      name: sealing__charm_comp_1
       rect:
         serializedVersion: 2
-        x: 909
-        y: 2209
-        width: 127
-        height: 167
+        x: 32
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,19 +134,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1fe63298e23ceeb4daf5ca841c2c1e6c
+      spriteID: 00a8fbf8b0d97e94d923eb15d97ab3f4
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_2"
+      name: sealing__charm_comp_2
       rect:
         serializedVersion: 2
-        x: 269
-        y: 1569
-        width: 127
-        height: 167
+        x: 64
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -157,19 +154,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f7ceddbe2c6b65345877d4471c5f26b2
+      spriteID: e05d997ac3a3a9048bd8110398b6c5bc
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_3"
+      name: sealing__charm_comp_3
       rect:
         serializedVersion: 2
-        x: 909
-        y: 1569
-        width: 127
-        height: 167
+        x: 0
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -177,19 +174,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c446ee946ffaf504b80d3051f4a705b1
+      spriteID: 8845a34e048500545b6b792abc2db62d
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_4"
+      name: sealing__charm_comp_4
       rect:
         serializedVersion: 2
-        x: 269
-        y: 929
-        width: 127
-        height: 167
+        x: 32
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -197,67 +194,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c51cf5bd5d916aa4fae306ae76ac29ea
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_5"
-      rect:
-        serializedVersion: 2
-        x: 909
-        y: 929
-        width: 127
-        height: 167
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 56ef58c55dcfafe449eaa8921ef23ee8
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_6"
-      rect:
-        serializedVersion: 2
-        x: 269
-        y: 289
-        width: 127
-        height: 167
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 45152b08e574f83418c92469d5922570
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\u3053\u304C\u306D\u3053(Front and more)by\u306B\u308F\u304F\u3093_7"
-      rect:
-        serializedVersion: 2
-        x: 909
-        y: 289
-        width: 127
-        height: 167
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6baafd18698af5243a696deb8329b876
+      spriteID: 4cefbd513cc4dc7428ba07769f322a26
       vertices: []
       indices: 
       edges: []
@@ -265,7 +202,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 636a8eead9ea20843a978c4b4ac6a927
+    spriteID: 5962429a5005952478f511b3e3eb9076
     vertices: []
     indices: 
     edges: []

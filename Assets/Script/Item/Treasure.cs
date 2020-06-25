@@ -1,36 +1,50 @@
-﻿using System.Collections;
+﻿using System.Text;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Treasure : MonoBehaviour
 {
+    static string text1 = "神力を{0}手に入れた";
+    static string text2 = "{0}を{1}個手に入れた";
+    static Item tmpItem;
+
     [SerializeField] CircleCollider2D cc = default;
     [SerializeField] SpriteRenderer sr = default;
     [SerializeField] Sprite s = default;
+    [SerializeField] int id = default;
     [SerializeField] int amount = default;
-    //[SerializeField] Item content = default; //内容物数字
+    [SerializeField] int containedItemID = default; //内容物数字
 
     bool canOpen = false;
     bool empty = false;
 
-    public void Set()
+    void Start()
     {
-
+        empty = !GameSystem.Instance.GetTreasureFlag(id);
     }
 
     public void Act()
     {
         if (!canOpen || empty)
             return;
-
+        //Debug.Log(true);
         if (Input.GetMouseButtonDown(0) && cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
         {
 
             empty = true;
+            GameSystem.Instance.SetTreasureFlag(id);
             sr.sprite = s;
-            EventTextManager.Instance.Set("霊力を" + amount.ToString() + "Pを手に入れた");
-            Mikochan.Instance.GetExp(amount);
-
+            if (containedItemID == -1)
+            {
+                Mikochan.Instance.GetExp(amount);
+                EventTextManager.Instance.Set(string.Format(text1, amount));
+                return;
+            }
+            tmpItem = ItemManager.Instance.GetItemInfo(containedItemID);
+            EventTextManager.Instance.Set(string.Format(text2, tmpItem.ItemName, amount));
+            Menu.Instance.StoreItem(tmpItem, amount);
+            tmpItem = null;
         }
 
     }

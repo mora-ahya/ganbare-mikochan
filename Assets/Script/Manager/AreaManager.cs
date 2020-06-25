@@ -65,6 +65,11 @@ public class AreaManager : MonoBehaviour
 
     }
 
+    public int GetCurrentAreaNumber()
+    {
+        return currentArea.AreaNumber;
+    }
+
     public void StageTransition(Stage nextStage)
     {
         currentArea.Transition(nextStage);

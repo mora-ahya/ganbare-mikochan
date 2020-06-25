@@ -6,12 +6,7 @@ public class EventBase : MonoBehaviour
 {
     protected FunctionalStateMachine eventPhase;
 
-    public virtual void Act()
-    {
-        eventPhase();
-    }
-
-    void Update()
+    public void Act()
     {
         eventPhase?.Invoke();
     }

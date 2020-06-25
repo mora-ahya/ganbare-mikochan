@@ -43,8 +43,6 @@ public class Karakasa : Enemy
         act();
         hitArea.transform.position = transform.position;
         SetActiveAreaPosition();
-        //CurrentMaterialIsDamageEffect();
-        //Debug.Log(isGround);
     }
 
     void SquatingProcess()
@@ -138,6 +136,12 @@ public class Karakasa : Enemy
 
     void StunProcess()
     {
+        if (Mathf.Abs(rb.velocity.x) >= 0.01f)
+        {
+            tmp.Set(0f, rb.velocity.y);
+            rb.velocity = tmp;
+        }
+
         if (counter++ < 300 || isSealed)
             return;
 

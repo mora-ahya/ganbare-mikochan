@@ -11,8 +11,9 @@ public class GameSystem : MonoBehaviour
     /* Saveデータ形式
      * 宝箱情報...unsigned intのビット演算式
      * みこちゃん...各スキルLv、経験値、アイテム所持数
-     * 進行度...クリアしたエリア数
+     * 進行度...クリアしたエリア数、イベント閲覧
     */
+    int graveyardTreasureFlag = 0;
 
     static GameSystem gameSystemInstance;
     public static GameSystem Instance => gameSystemInstance;
@@ -25,16 +26,15 @@ public class GameSystem : MonoBehaviour
     public readonly WaitForSeconds FourSecond = new WaitForSeconds(4f);
     public readonly WaitForSeconds FiveSecond = new WaitForSeconds(5f);
 
-    bool movie;
-
     FunctionalStateMachine scene;
 
     [SerializeField] CircleGrayScaleEffect cgse = default;
     [SerializeField] Image darkness = default;
     [SerializeField] Image whiteness = default;
 
+    EventBase eventScene = null;
+
     public bool enemyStop;
-    public bool Movie => movie;
     public bool Stop = false;
     public bool IsGameOver = true;
     public Image Darkness => darkness;
@@ -50,16 +50,15 @@ public class GameSystem : MonoBehaviour
     {
         darkness.CrossFadeAlpha(0, 0, true);
         darkness.gameObject.SetActive(true);
-        TrainingSceneManager.Instance.IsOperational = true;
         Stop = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            TrainingSceneManager.Instance.DisplayTrainingScene();
+            Menu.Instance.DisplayMenu();
         }
         /* //テスト実装
         if (Input.GetKeyDown(KeyCode.Z)) {
@@ -86,9 +85,11 @@ public class GameSystem : MonoBehaviour
             }
         }
         */
+        EventTextManager.Instance.Act();
+        if (eventScene != null)
+            eventScene.Act();
         Mikochan.Instance.Act();
         AreaManager.Instance.Act();
-        EventTextManager.Instance.Act();
     }
     
     void AreaScene()
@@ -101,6 +102,32 @@ public class GameSystem : MonoBehaviour
     void AreaSelectScene()
     {
 
+    }
+
+    public void StartEvent(EventBase eb)
+    {
+        eventScene = eb;
+    }
+
+    public bool GetTreasureFlag(int treasureNum)
+    {
+        int tmp = AreaManager.Instance.GetCurrentAreaNumber();
+
+        if (tmp == 0)
+            return (graveyardTreasureFlag & (1 << treasureNum)) == 0;
+
+        return false;
+    }
+
+    public void SetTreasureFlag(int treasureNum)
+    {
+        int tmp = AreaManager.Instance.GetCurrentAreaNumber();
+
+        if (tmp == 0)
+        {
+            graveyardTreasureFlag |= 1 << treasureNum;
+            return;
+        }
     }
 
     public void GameStop()
@@ -121,14 +148,14 @@ public class GameSystem : MonoBehaviour
 
     public void GameOver()
     {
-        TrainingSceneManager.Instance.IsOperational = false;
+       Menu.Instance.IsOperational = false;
         IsGameOver = true;
         StartCoroutine("ToResult");
     }
 
     public void GameClear()
     {
-        TrainingSceneManager.Instance.IsOperational = false;
+        Menu.Instance.IsOperational = false;
         IsGameOver = false;
         StartCoroutine("ToResult");
     }

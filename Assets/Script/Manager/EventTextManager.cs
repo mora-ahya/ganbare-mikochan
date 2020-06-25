@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class EventTextManager : MonoBehaviour
 {
-    private static EventTextManager EventTextManagerInstance;
+    static EventTextManager EventTextManagerInstance;
 
     public static EventTextManager Instance => EventTextManagerInstance;
 
@@ -165,7 +165,7 @@ public class EventTextManager : MonoBehaviour
     {
         //GameSystem.Instance.Stop = true;
         GameSystem.Instance.GameStop();
-        TrainingSceneManager.Instance.IsOperational = false;
+        Menu.Instance.IsOperational = false;
         //Time.timeScale = 0;
         gameObject.SetActive(true);
     }
@@ -174,7 +174,7 @@ public class EventTextManager : MonoBehaviour
     {
         //GameSystem.Instance.Stop = false;
         GameSystem.Instance.GameRestart();
-        TrainingSceneManager.Instance.IsOperational = true;
+        Menu.Instance.IsOperational = true;
         //Time.timeScale = 1;
         nameText.text = null;
         mainText.text = null;

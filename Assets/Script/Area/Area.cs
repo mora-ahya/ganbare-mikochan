@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class Area : MonoBehaviour
 {
-    [SerializeField] Treasure[] treasureInArea = default;
     [SerializeField] Stage initStage = default;
     [SerializeField] Stage currentStage = default;
+    [SerializeField] int areaNumber = default;
+
+    public int AreaNumber => areaNumber;
 
     public void Initialize()
     {

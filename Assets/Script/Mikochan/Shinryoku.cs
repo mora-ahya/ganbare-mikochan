@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Shinryoku : MonoBehaviour
 {
-    delegate void Movement();
-
     static Vector2 Tmp;
 
     [SerializeField] Enemy enemy = default;
@@ -14,7 +12,8 @@ public class Shinryoku : MonoBehaviour
 
     float whiteDegree = 1f;
     float velocity = 0f;
-    Movement movement;
+    FunctionalStateMachine movement;
+    Vector2 storedVelocity;
 
     public void Init(Material m)
     {
@@ -67,5 +66,40 @@ public class Shinryoku : MonoBehaviour
         }
 
         rb.velocity = Tmp.normalized * velocity;
+    }
+
+    public void Pause()
+    {
+        if (rb != null && rb.bodyType != RigidbodyType2D.Static)
+        {
+            StorePhysic();
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+    }
+
+    public virtual void Restart()
+    {
+        if (rb != null && rb.bodyType != RigidbodyType2D.Dynamic)
+        {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            RestorePhysic();
+        }
+    }
+
+    public virtual void StorePhysic()
+    {
+        if (rb != null)
+        {
+            storedVelocity = rb.velocity;
+            //rb.velocity = Vector2.zero;
+        }
+    }
+
+    public virtual void RestorePhysic()
+    {
+        if (rb != null)
+            rb.velocity = storedVelocity;
+
+        storedVelocity = Vector2.zero;
     }
 }

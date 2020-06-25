@@ -13,6 +13,7 @@ public class Hitotsumekozou : Enemy
 
     [SerializeField] CapsuleCollider2D cc = default;
     [SerializeField] CapsuleCollider2D hitArea = default;
+    [SerializeField] BoxCollider2D bc = default;
     [SerializeField] Sprite stunSprite = default;
 
     Vector3 tmp;
@@ -47,14 +48,21 @@ public class Hitotsumekozou : Enemy
 
     void SearchingProcess()
     {
+        if (Mathf.Abs(rb.velocity.x) >= 0.01f)
+        {
+            tmp.Set(0f, rb.velocity.y, 0f);
+            rb.velocity = tmp;
+        }
+
         if (counter++ != 90)
             return;
 
         counter = 0;
         dir *= -1;
-        tmp = gameObject.transform.localScale;
+        sr.flipX = !sr.flipX;
+        tmp = bc.gameObject.transform.localScale;
         tmp.x *= -1;
-        gameObject.transform.localScale = tmp;
+        bc.gameObject.transform.localScale = tmp;
     }
 
     void RunningProcess()
@@ -122,6 +130,12 @@ public class Hitotsumekozou : Enemy
 
     void StunProcess()
     {
+        if (Mathf.Abs(rb.velocity.x) >= 0.01f)
+        {
+            tmp.Set(0f, rb.velocity.y, 0f);
+            rb.velocity = tmp;
+        }
+
         if (counter++ < 300 || isSealed)
             return;
 

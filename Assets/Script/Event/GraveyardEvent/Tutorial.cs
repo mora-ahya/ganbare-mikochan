@@ -6,16 +6,9 @@ public class Tutorial : EventBase
 {
     [SerializeField] BoxCollider2D bc = default;
     [SerializeField] Scarecrow scarecrow = default;
-    readonly string textName = "Text/tutorial";
+    readonly string textName = "Text/Graveyard/tutorial";
 
     List<string> tutorialText = new List<string>();
-    int couter = 0;
-    
-    void Start()
-    {
-        TextLoader.Instance.LoadText(textName, tutorialText);
-        //eventPhase = Test;
-    }
 
     void FirstWaitText()
     {
@@ -90,7 +83,7 @@ public class Tutorial : EventBase
 
     void MikochanOnScarecrow()
     {
-        if (Mikochan.Instance.transform.position.x < scarecrow.transform.position.x)
+        if (Mikochan.Instance.transform.position.x - scarecrow.transform.position.x < -0.3f)
             return;
 
         Mikochan.Instance.StopCommand();
@@ -111,15 +104,27 @@ public class Tutorial : EventBase
             return;
 
         //みこちゃん封印コマンド
+        Mikochan.Instance.SealCommand();
+        eventPhase = Sealing;
+    }
+
+    void Sealing()
+    {
+        if (!GameSystem.Instance.Whiteness.gameObject.activeSelf)
+            return;
+
         scarecrow.Restart();
         scarecrow.Sealed();
-        eventPhase = EndTutorial;
+        Mikochan.Instance.Target = null;
         EventTextManager.Instance.IsStayed = false;
+        eventPhase = EndTutorial;
     }
 
     void EndTutorial()
     {
-        scarecrow.Act();
+        if (scarecrow.gameObject.activeSelf)
+            scarecrow.Act();
+
         if (EventTextManager.Instance.gameObject.activeSelf)
             return;
 
@@ -131,12 +136,14 @@ public class Tutorial : EventBase
     {
         if (collision.CompareTag(Mikochan.Instance.tag))
         {
+            TextLoader.Instance.LoadText(textName, tutorialText);
             EventTextManager.Instance.Set(tutorialText);
             eventPhase = FirstWaitText;
             Mikochan.Instance.Restart();
             Mikochan.Instance.ChangeAuto();
             Mikochan.Instance.StopCommand();
             bc.enabled = false;
+            GameSystem.Instance.StartEvent(this);
         }
     }
 }

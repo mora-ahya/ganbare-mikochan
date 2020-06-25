@@ -314,7 +314,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mhp: 3
   hp: 3
-  exp: 0
+  exp: 500
   attack: 0
   invincible: 0
   whiteOutShader: {fileID: 4800000, guid: 09a81e34f60a54a48a363470b6c8ea7f, type: 3}
@@ -328,6 +328,7 @@ MonoBehaviour:
   stunEffect: {fileID: 5841654507600483456}
   rb: {fileID: 6718867133386515298}
   shinryoku: {fileID: 4388203393867305579}
+  animator: {fileID: 0}
   hitArea: {fileID: 6718867133386515297}
   s:
   - {fileID: 21300000, guid: fae28a910dd8eb540b9ea07c9f25299a, type: 3}

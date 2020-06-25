@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TrainingSceneManager : MonoBehaviour
+public class StrengtheningMikochan : MonoBehaviour
 {
-    static TrainingSceneManager trainingSceneManagerInstance;
-    public static TrainingSceneManager Instance => trainingSceneManagerInstance;
 
     readonly float ohudaTop = 424.5f;
     readonly float ohudaSpace = 70f;
@@ -14,6 +12,9 @@ public class TrainingSceneManager : MonoBehaviour
     readonly float buttonSpace = 150f;
     readonly int maxLv = 25;
     readonly int offset = 5;
+    readonly string coroutineNameIncreaseFullAmount = "IncreaseFullAmount";
+    readonly string necesaryExpText = "必要神力: {0,-5:00000}P";
+    readonly string possessionExpText = "所持神力: {0,-5:00000}P";
     readonly string[] explains = new string[] {
         "1回ごとに神様領域が少し広くなります。\n5回ごとに神様に関するスペシャルなスキルを獲得できます。",//kamiAreaButton
         "1回ごとにHPが5増加します。\n5回ごとにHPに関するスペシャルなスキルを獲得できます。",//hpButton
@@ -27,10 +28,10 @@ public class TrainingSceneManager : MonoBehaviour
         "神様の攻撃力が1増加します。",//kamiAreaButton:1,3
         "神様の加護により受けるダメージが10%減少します。",//kamiAreaButton:2,4    [10]
         "神様の攻撃力が2増加します。",//kamiAreaButton:5
-        "被ダメージ時のノックバックが軽減されます。",//verySpecialButton:1,4
-        "未定",//verySpecialButton:2
-        "神様の加護により受けるダメージが30%軽減されます。",//verySpecialButton:3
-        "被ダメージ時の無敵時間が長くなります。"//verySpecialButton:5
+        "被ダメージ時のノックバックが軽減されます。",//verySpecialButton:1
+        "被ダメージ時のノックバックがなくなります。",//verySpecialButton:3
+        "神様の加護により受けるダメージが30%軽減されます。",//verySpecialButton:5
+        "被ダメージ時の無敵時間が長くなります。"//verySpecialButton:2,4
     };
 
     [SerializeField] Image[] ohudas = default;
@@ -39,14 +40,13 @@ public class TrainingSceneManager : MonoBehaviour
     [SerializeField] GameObject pDiver = default;
     [SerializeField] ParticleSystem psConv = default;
     [SerializeField] ParticleSystem psDiver = default;
-    [SerializeField] Text tExp = default;
+    [SerializeField] Text nExpText = default;
+    [SerializeField] Text pExpText = default;
     [SerializeField] Text explain = default;
 
     ParticleSystem.MainModule psm;
     Image ohuda;
-    Mikochan miko;
     bool isRunning = false;
-    bool isOperational = true;
     readonly WaitForSecondsRealtime w = new WaitForSecondsRealtime(0.05f);
 
     int kamiAreaLv = 1;//save対象
@@ -56,71 +56,34 @@ public class TrainingSceneManager : MonoBehaviour
     int tmp;
     float endAmount;
 
-    public bool IsOperational
-    {
-        get
-        {
-            return isOperational;
-        }
-
-        set
-        {
-            isOperational = value;
-        }
-    }
-
-    void Awake()
-    {
-        trainingSceneManagerInstance = this;
-        gameObject.SetActive(false);
-    }
-
     void Start()
     {
         //particle.transform.position = particle.transform.TransformPoint(new Vector3(100, 175, 0));
-        tExp.text = "必要神力: " + necessaryExp.ToString() + "P";
-        miko = Mikochan.Instance;
+        nExpText.text = string.Format(necesaryExpText, necessaryExp);
     }
 
-    public void DisplayTrainingScene()
+    public void SetPossessionExpText()
     {
-        if (!isOperational)
-            return;
-
-        if (GameSystem.Instance.Stop)
-        {
-            CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, false);
-            GameSystem.Instance.GameRestart();
-            if (isRunning)
-            {
-                ParticleOff();
-            }
-            gameObject.SetActive(false);
-            return;
-        }
-
-        CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.GAUSSIANBLUR_EFFECT, true);
-        GameSystem.Instance.GameStop();
-        gameObject.SetActive(true);
-
+        pExpText.text = string.Format(possessionExpText, Mikochan.Instance.Exp);
     }
 
     void IncreaseNecessaryExp()
     {
-        miko.GetExp(-necessaryExp);
-        if (kamiAreaLv + hpLv + specialLv - 3 == 5)
+        Mikochan.Instance.GetExp(-necessaryExp);
+        tmp = kamiAreaLv + hpLv + specialLv - 3;
+        if (tmp == 5)
         {
             necessaryExp = 150;
         }
-        else if (kamiAreaLv + hpLv + specialLv - 3 == 15)
+        else if (tmp == 15)
         {
             necessaryExp = 500;
         }
-        else if (kamiAreaLv + hpLv + specialLv - 3 == 25)
+        else if (tmp == 25)
         {
             necessaryExp = 1350;
         }
-        else if (kamiAreaLv + hpLv + specialLv - 3 >= 50)
+        else if (tmp >= 50)
         {
             necessaryExp = 15000;
         }
@@ -128,7 +91,8 @@ public class TrainingSceneManager : MonoBehaviour
         {
             necessaryExp = (int)(necessaryExp * 1.1);
         }
-        tExp.text = "必要神力: " + necessaryExp.ToString() + "P";
+        nExpText.text = string.Format(necesaryExpText, necessaryExp);
+        pExpText.text = string.Format(possessionExpText, Mikochan.Instance.Exp);
     }
 
     void ButtonSizeReset()
@@ -144,103 +108,109 @@ public class TrainingSceneManager : MonoBehaviour
 
     public void PushedButton0()
     {
-        if (!isRunning && kamiAreaLv <= maxLv && miko.Exp >= necessaryExp)
+        if (isRunning || kamiAreaLv > maxLv || Mikochan.Instance.Exp < necessaryExp)
+            return;
+
+        //buttons[0].interactable = false;
+        ohuda = ohudas[(int)((kamiAreaLv - 1) / offset)];
+        isRunning = true;
+        Mikochan.Instance.ExtendKamiArea();
+        psm = psConv.main;
+        psm.startColor = Color.yellow;
+        psm = psDiver.main;
+        psm.startColor = Color.yellow;
+        pConv.transform.position = buttons[0].gameObject.transform.position;
+        pDiver.transform.position = ohuda.transform.position;
+        StartCoroutine(coroutineNameIncreaseFullAmount);
+        if (kamiAreaLv % 5 == 0)
         {
-            //buttons[0].interactable = false;
-            ohuda = ohudas[(int)((kamiAreaLv - 1) / offset)];
-            isRunning = true;
-            miko.ExtendKamiArea();
-            psm = psConv.main;
-            psm.startColor = Color.yellow;
-            psm = psDiver.main;
-            psm.startColor = Color.yellow;
-            pConv.transform.position = buttons[0].gameObject.transform.position;
-            pDiver.transform.position = ohuda.transform.position;
-            StartCoroutine("IncreaseFullAmount");
-            if (kamiAreaLv % 5 == 0)
-            {
-                miko.Special(kamiAreaLv / offset + offset);
-            }
-            if (kamiAreaLv == maxLv)
-            {
-                buttons[0].interactable = false;
-            }
-            else
-            {
-                kamiAreaLv++;
-            }
-            IncreaseNecessaryExp();
+            Mikochan.Instance.Special(kamiAreaLv / offset + offset);
         }
+        if (kamiAreaLv == maxLv)
+        {
+            buttons[0].interactable = false;
+        }
+        else
+        {
+            kamiAreaLv++;
+        }
+        IncreaseNecessaryExp();
+
     }
 
     public void PushedButton1()
     {
-        if (!isRunning && hpLv <= maxLv && miko.Exp >= necessaryExp)
+        if (isRunning || hpLv > maxLv || Mikochan.Instance.Exp < necessaryExp)
+            return;
+
+        ohuda = ohudas[(int)((hpLv - 1) / offset) + offset];
+        isRunning = true;
+        Mikochan.Instance.IncreaseMikochanHP(5);
+        psm = psConv.main;
+        psm.startColor = Color.green;
+        psm = psDiver.main;
+        psm.startColor = Color.green;
+        pConv.transform.position = buttons[1].gameObject.transform.position;
+        pDiver.transform.position = ohuda.transform.position;
+        StartCoroutine(coroutineNameIncreaseFullAmount);
+        if (hpLv % 5 == 0)
         {
-            ohuda = ohudas[(int)((hpLv - 1) / offset) + offset];
-            isRunning = true;
-            miko.IncreaseMikochanHP(5);
-            psm = psConv.main;
-            psm.startColor = Color.green;
-            psm = psDiver.main;
-            psm.startColor = Color.green;
-            pConv.transform.position = buttons[1].gameObject.transform.position;
-            pDiver.transform.position = ohuda.transform.position;
-            StartCoroutine("IncreaseFullAmount");
-            if (hpLv % 5 == 0)
-            {
-                miko.Special(hpLv / 5);
-            }
-            if (hpLv == maxLv)
-            {
-                buttons[1].interactable = false;
-            }
-            else
-            {
-                hpLv++;
-            }
-            IncreaseNecessaryExp();
+            Mikochan.Instance.Special(hpLv / 5);
         }
+        if (hpLv == maxLv)
+        {
+            buttons[1].interactable = false;
+        }
+        else
+        {
+            hpLv++;
+        }
+        IncreaseNecessaryExp();
     }
 
     public void PushedButton2()
     {
-        if (!isRunning && specialLv <= maxLv && miko.Exp >= necessaryExp)
+        if (isRunning || specialLv > maxLv || Mikochan.Instance.Exp < necessaryExp)
+            return;
+
+        ohuda = ohudas[(int)((specialLv - 1) / 5) + offset * 2];
+        isRunning = true;
+        psm = psConv.main;
+        psm.startColor = Color.red;
+        psm = psDiver.main;
+        psm.startColor = Color.red;
+        pConv.transform.position = buttons[2].gameObject.transform.position;
+        pDiver.transform.position = ohuda.transform.position;
+        StartCoroutine(coroutineNameIncreaseFullAmount);
+        if (specialLv % 5 == 0)
         {
-            ohuda = ohudas[(int)((specialLv - 1) / 5) + offset * 2];
-            isRunning = true;
-            psm = psConv.main;
-            psm.startColor = Color.red;
-            psm = psDiver.main;
-            psm.startColor = Color.red;
-            pConv.transform.position = buttons[2].gameObject.transform.position;
-            pDiver.transform.position = ohuda.transform.position;
-            StartCoroutine("IncreaseFullAmount");
-            if (specialLv % 5 == 0)
-            {
-                miko.Special(specialLv / 5 + offset * 2);
-            }
-            if (specialLv == maxLv)
-            {
-                buttons[2].interactable = false;
-            }
-            else
-            {
-                specialLv++;
-            }
-            IncreaseNecessaryExp();
+            Mikochan.Instance.Special(specialLv / 5 + offset * 2);
         }
+        if (specialLv == maxLv)
+        {
+            buttons[2].interactable = false;
+        }
+        else
+        {
+            specialLv++;
+        }
+        IncreaseNecessaryExp();
     }
 
-    public void ParticleOff()
+    public void DoBeforeInactive()
     {
-        pConv.SetActive(false);
-        pDiver.SetActive(false);
-        isRunning = false;
-        ohuda.fillAmount = endAmount;
+        if (isRunning)
+        {
+            psConv.Stop();
+            psDiver.Stop();
+            pConv.SetActive(false);
+            pDiver.SetActive(false);
+            isRunning = false;
+            ohuda.fillAmount = endAmount;
+        }
         ButtonSizeReset();
     }
-    public void ExplainHidden()
+    public void HideExplain()
     {
         explain.text = "";
     }
@@ -286,15 +256,15 @@ public class TrainingSceneManager : MonoBehaviour
         {
             explain.text = explains[3];
         }
-        else if (tmp % 3 == 0)
+        else if (tmp == 0)
         {
             explain.text = explains[12];
         }
-        else if (tmp == 1)
+        else if (tmp == 2)
         {
             explain.text = explains[13];
         }
-        else if (tmp == 2)
+        else if (tmp == 4)
         {
             explain.text = explains[14];
         }

@@ -42,162 +42,14 @@ public class Gashadokuro : Enemy
     readonly float secondHandDis = 2.5f; //振り下ろし2の手の位置とがしゃ本体の位置の距離
     bool move = false;
     bool runCoroutine = false;
-    /*
-    State state = State.Appearance;
-
-    enum State
-    {
-        Appearance,
-        Sprinkle,
-        Swing,
-        Return,
-        RowAway,
-        Stun,
-        Recovery,
-        Beaten
-    }*/
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         defaultPosX = transform.position.x;
         HandCollider(false);
         wait = GameSystem.Instance.TwoSecond;
-        act = AppearanceProcess;
+        act = null;
     }
-
-    /*
-    void Update()
-    {
-        //switch (state)
-        //{
-        //    case State.Appearance: //登場シーン
-        //        if (!runCoroutine)
-        //        {
-        //            if (!cm.GetShake)
-        //            {
-        //                cm.Shake(true);
-        //            }
-        //            anim = animator.GetCurrentAnimatorStateInfo(0);
-        //            if (anim.IsName(animNameCooltime))
-        //            {
-        //                HandCollider(true);
-        //                runCoroutine = true;
-        //                cm.Shake(false);
-        //                StartCoroutine(Cooltime());
-        //            }
-        //            else if (anim.IsName(animNameLaugh) && !HowlManager.Instance.gameObject.activeSelf)
-        //            {
-        //                if (!cm.GetShake)
-        //                {
-        //                    cm.Shake(true);
-        //                }
-        //                HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
-        //            }
-        //            else if (cm.GetShake && anim.IsName(animNameAppearance) && anim.normalizedTime > 1)
-        //            {
-        //                cm.Shake(false);
-        //            }
-        //        }
-        //        break;
-
-        //    case State.Sprinkle: //腕の振り上げ
-        //        Sprinkle();
-        //        state = State.Swing;
-        //        break;
-
-        //    case State.Swing: //腕の振り下げs
-        //        if (!runCoroutine)
-        //        {
-        //            anim = animator.GetCurrentAnimatorStateInfo(0);
-        //            if (anim.IsName(animNameCooltime))
-        //            {
-        //                swingCount++;
-        //                if (!CheckShots() && swingCount == shotInterval)
-        //                {
-        //                    animator.SetBool(animBoolOpenMouse, true);
-        //                }
-        //                ResetHandBool();
-        //                ResetSwingBool();
-        //                runCoroutine = true;
-        //                StartCoroutine(Cooltime());
-        //            }
-        //        }
-        //        break;
-
-        //    case State.Return: //ダメージを与えられ真ん中に戻る
-        //        anim = animator.GetCurrentAnimatorStateInfo(0);
-        //        if (anim.IsName(animNameHottime))
-        //        {
-        //            if (hp > 0)
-        //            {
-        //                ReturnDefaultPos();
-        //                state = State.RowAway;
-        //                swingCount = 0;
-        //            }
-        //            else
-        //            {
-
-        //            }
-        //        }
-        //        break;
-
-        //    case State.RowAway: //薙ぎ払い
-        //        if (!move && !runCoroutine)
-        //        {
-        //            runCoroutine = true;
-        //            StartCoroutine(Hottime());
-        //        }
-        //        break;
-
-        //    case State.Stun: //気絶状態
-        //        if (handL.enabled)
-        //        {
-        //            anim = animator.GetCurrentAnimatorStateInfo(0);
-        //            if (anim.IsName(animNameBroken))
-        //            {
-        //                HandCollider(false);
-        //            }
-        //        }
-        //        else if (swingCount == shotCount)
-        //        {
-        //            state = State.Recovery;
-        //        }
-        //        else if (!runCoroutine)
-        //        {
-        //            runCoroutine = true;
-        //            StartCoroutine(ShotInterval());
-        //        }
-        //        break;
-
-        //    case State.Recovery: //気絶から復帰
-        //        if (!runCoroutine)
-        //        {
-        //            if (animator.GetBool(animBoolRecovery))
-        //            {
-        //                anim = animator.GetCurrentAnimatorStateInfo(0);
-        //                if (anim.IsName(animNameCooltime))
-        //                {
-        //                    ResetHandBool();
-        //                    ResetSwingBool();
-        //                    Upgrade();
-        //                    HandCollider(true);
-        //                    swingCount = 0;
-        //                    state = State.Sprinkle;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (!CheckShots())
-        //                {
-        //                    animator.SetBool(animBoolRecovery, true);
-        //                }
-        //            }
-        //        }
-        //        break;
-        //}
-        Act();
-    }*/
 
     public override void Set()
     {
@@ -211,24 +63,26 @@ public class Gashadokuro : Enemy
         MakeShot();
     }
 
-    void AppearanceProcess()
+    public void StartToBattle()
+    {
+        HandCollider(true);
+        runCoroutine = true;
+        StartCoroutine(Cooltime());
+    }
+
+    public bool AppearanceProcess()
     {
         if (runCoroutine)
-            return;
+            return false;
 
         if (!CameraManager.Instance.GetShake)
             CameraManager.Instance.Shake(true);
         
-
         anim = animator.GetCurrentAnimatorStateInfo(0);
         if (anim.IsName(animNameCooltime))
         {
-            HandCollider(true);
-            runCoroutine = true;
             CameraManager.Instance.Shake(false);
-            StartCoroutine(Cooltime());
-            TrainingSceneManager.Instance.IsOperational = true;
-            return;
+            return true;
         }
 
         if (anim.IsName(animNameLaugh) && !HowlManager.Instance.gameObject.activeSelf)
@@ -238,11 +92,13 @@ public class Gashadokuro : Enemy
                 CameraManager.Instance.Shake(true);
             }
             HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
-            return;
+            return false;
         }
 
         if (CameraManager.Instance.GetShake && anim.IsName(animNameAppearance) && anim.normalizedTime > 1)
             CameraManager.Instance.Shake(false);
+
+        return false;
     }
 
     void SprinkleProcess()
@@ -538,6 +394,16 @@ public class Gashadokuro : Enemy
             shotInterval = 4;
             return;
         }
+    }
+
+    public override void Pause()
+    {
+
+    }
+
+    public override void Restart()
+    {
+
     }
 
     private IEnumerator Cooltime() //腕を振り下ろした後の待機時間
