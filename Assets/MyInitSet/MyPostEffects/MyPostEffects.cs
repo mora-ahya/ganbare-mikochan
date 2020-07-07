@@ -2,49 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MyPostEffects : MonoBehaviour
+
+namespace MyInitSet
 {
-    public static readonly int WAVE_EFFECT = 0;
-    public static readonly int GAUSSIANBLUR_EFFECT = 1;
-    public static readonly int SIMPLECOLOR_EFFECT = 2;
-    public static readonly int CIRCLE_GRAYSCALE_EFFECT = 3;
-
-    [SerializeField] PostEffect[] postEffects = default;
-
-    public bool GetEffectActive(int effectNum)
+    public class MyPostEffects : MonoBehaviour
     {
-        return postEffects[effectNum].IsActive;
-    }
+        public static readonly int WAVE_EFFECT = 0;
+        public static readonly int GAUSSIANBLUR_EFFECT = 1;
+        public static readonly int SIMPLECOLOR_EFFECT = 2;
+        public static readonly int CIRCLE_GRAYSCALE_EFFECT = 3;
+        public static readonly int RIPPLE_EFFECT = 4;
 
-    public void SetEffectActive(int effectNum, bool b)
-    {
-        if (b)
+        [SerializeField] PostEffect[] postEffects = default;
+
+        public bool GetEffectActive(int effectNum)
         {
-            if (!postEffects[effectNum].IsActive)
+            return postEffects[effectNum].IsActive;
+        }
+
+        public void GenerateRipple(Vector2 genaratePosition, float waveScope, float waveInterval, float waveStrength, float waveDecreaseRate, float waveSpeed, float duration)
+        {
+            ((Ripple)postEffects[RIPPLE_EFFECT]).Set(genaratePosition, waveScope, waveInterval, waveStrength, waveDecreaseRate, waveSpeed, duration);
+        }
+
+        public void SetEffectActive(int effectNum, bool b)
+        {
+            if (b)
             {
-                postEffects[effectNum].IsActive = b;
-                postEffects[effectNum].Clear();
+                if (!postEffects[effectNum].IsActive)
+                {
+                    postEffects[effectNum].IsActive = b;
+                    postEffects[effectNum].Clear();
+                }
             }
-        }
-        else
-        {
-            if (postEffects[effectNum].IsActive)
+            else
             {
-                postEffects[effectNum].IsActive = b;
+                if (postEffects[effectNum].IsActive)
+                {
+                    postEffects[effectNum].IsActive = b;
+                }
             }
+
+
         }
-        
 
-    }
-
-    void OnRenderImage(RenderTexture src, RenderTexture dest)
-    {
-        foreach (PostEffect pe in postEffects)
+        void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            if (pe.IsActive)
-                pe.Run();
+            foreach (PostEffect pe in postEffects)
+            {
+                if (pe.IsActive)
+                    pe.Run();
+            }
+            Graphics.Blit(src, dest);
+            //Debug.Log(true);
         }
-        Graphics.Blit(src, dest);
-        //Debug.Log(true);
     }
 }

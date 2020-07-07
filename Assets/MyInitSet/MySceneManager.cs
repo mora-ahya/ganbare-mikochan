@@ -2,36 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MySceneManager : MonoBehaviour
+namespace MyInitSet
 {
-    static MySceneManager mySceneManagerInstance;
-    public static MySceneManager Instance => mySceneManagerInstance;
-
-    delegate SceneProcess SceneProcess();
-
-    SceneProcess scene;
-    int result;
-
-    void Awake()
+    public class MySceneManager : MonoBehaviour
     {
-        Screen.SetResolution(800, 640, false);
-        mySceneManagerInstance = this;
-    }
+        static MySceneManager mySceneManagerInstance;
+        public static MySceneManager Instance => mySceneManagerInstance;
 
-    void Start()
-    {
-        scene = TitleScene;
-        result = 0;
-    }
+        delegate SceneProcess SceneProcess();
 
-    SceneProcess TitleScene()
-    {
-        
-        return null;
-    }
+        SceneProcess scene;
+        int result;
 
-    void Update()
-    {
-        scene = scene();
+        void Awake()
+        {
+            Screen.SetResolution(800, 640, false);
+            mySceneManagerInstance = this;
+        }
+
+        void Start()
+        {
+            scene = TitleScene;
+            result = 0;
+        }
+
+        SceneProcess TitleScene()
+        {
+
+            return null;
+        }
+
+        void Update()
+        {
+            scene = scene();
+        }
     }
 }

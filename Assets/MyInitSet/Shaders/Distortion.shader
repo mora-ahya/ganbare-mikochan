@@ -1,11 +1,11 @@
-﻿Shader "MyShader/GaussianBlur"
+﻿Shader "MyShader/Distortion"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
 	}
 
-	SubShader
+		SubShader
 	{
 		Cull Off ZWrite Off ZTest Always
 
@@ -29,12 +29,6 @@
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 
-			half _Offset;
-			half4 _Direction;
-
-			static const int samplingCount = 5;
-			half _Weights[samplingCount];
-
 			v2f vert(appdata v) {
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
@@ -44,21 +38,17 @@
 			}
 
 			fixed4 frag(v2f i) : SV_Target{
-				half4 col = 0;
+				float r = 0.5;
+				float2 origin = float2(0.5, 0.5);
+				float l = length(i.uv - origin);
+				float2 st = i.uv;
+				st -= origin;
+				st *= 1.5 + 15 * pow(l - r, 2);
+				st /= 1;
+				st += origin;
 
-				int j;
-				[unroll]
-				for (j = samplingCount - 1; j > 0; j--) 
-				{
-					col += tex2D(_MainTex, i.uv - (_Offset * _Direction.xy * j)) * _Weights[j];
-				}
-
-				[unroll]
-				for (j = 0; j < samplingCount; j++)
-				{
-					col += tex2D(_MainTex, i.uv + (_Offset * _Direction.xy * j)) * _Weights[j];
-				}
-
+				half4 col = (step(st.x, 1.0f) * step(0, st.x) * step(st.y, 1.0f) * step(0, st.y)) * tex2D(_MainTex, st);
+				
 				return col;
 			}
 

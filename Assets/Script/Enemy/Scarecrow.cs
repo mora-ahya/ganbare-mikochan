@@ -32,6 +32,7 @@ public class Scarecrow : Enemy
         if (invincible || !inRange || !Input.GetMouseButtonDown(0) || !hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
             return;
 
+        CameraManager.Instance.MainPostEffect.GenerateRipple(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.05f, 1f, 0.5f, 0f, 1f, 0.5f);
         StartCoroutine(CoroutineNameDamageEffect);
         Damage(Mikochan.Instance.KamiAttack);
         if (hp <= 0)

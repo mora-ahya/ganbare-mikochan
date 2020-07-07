@@ -3,44 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class WaveEffect : PostEffect
+namespace MyInitSet
 {
-    float x = 1f;
-    public float waveSpeed = 0.05f;
-
-    void Awake()
+    public class WaveEffect : PostEffect
     {
-        Initialize();
-    }
+        float x = 1f;
+        public float waveSpeed = 0.05f;
 
-    private void Initialize()
-    {
-        isActive = false;
-        material = new Material(shader);
-        cb = new CommandBuffer();
+        void Awake()
+        {
+            Initialize();
+        }
 
-        int tmpTexIdentifier = Shader.PropertyToID("PostEffectTmpTexture");
-        cb.GetTemporaryRT(tmpTexIdentifier, -1, -1);
-        //cb.SetGlobalFloat("_WaveSize", x);
-        //material.SetFloat("_WaveSize", x);
+        private void Initialize()
+        {
+            isActive = false;
+            material = new Material(shader);
+            cb = new CommandBuffer();
 
-        cb.Blit(BuiltinRenderTextureType.CameraTarget, tmpTexIdentifier);
-        cb.Blit(tmpTexIdentifier, BuiltinRenderTextureType.CameraTarget, material);
+            int tmpTexIdentifier = Shader.PropertyToID("PostEffectTmpTexture");
+            cb.GetTemporaryRT(tmpTexIdentifier, -1, -1);
+            //cb.SetGlobalFloat("_WaveSize", x);
+            //material.SetFloat("_WaveSize", x);
 
-        cb.ReleaseTemporaryRT(tmpTexIdentifier);
-        //cb.Clear();
+            cb.Blit(BuiltinRenderTextureType.CameraTarget, tmpTexIdentifier);
+            cb.Blit(tmpTexIdentifier, BuiltinRenderTextureType.CameraTarget, material);
 
-    }
+            cb.ReleaseTemporaryRT(tmpTexIdentifier);
+            //cb.Clear();
 
-    override public void Run()
-    {
-        material.SetFloat("_WaveSize", x);
-        Graphics.ExecuteCommandBuffer(cb);
-        x += waveSpeed;
-    }
+        }
 
-    override public void Clear()
-    {
-        x = 1f;
+        override public void Run()
+        {
+            material.SetFloat("_WaveSize", x);
+            Graphics.ExecuteCommandBuffer(cb);
+            x += waveSpeed;
+        }
+
+        override public void Clear()
+        {
+            x = 1f;
+        }
     }
 }

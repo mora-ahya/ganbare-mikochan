@@ -3,37 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class PostEffect : MonoBehaviour
+namespace MyInitSet
 {
-    [SerializeField]
-    protected Shader shader = default;
-    protected Material material;
-    protected CommandBuffer cb;
-    protected bool isActive;
-
-    public CommandBuffer Cb => cb;
-
-    public bool IsActive
+    public class PostEffect : MonoBehaviour
     {
-        get
+        [SerializeField]
+        protected Shader shader = default;
+        protected Material material;
+        protected CommandBuffer cb;
+        protected bool isActive;
+
+        public CommandBuffer Cb => cb;
+
+        public bool IsActive
         {
-            return isActive;
+            get
+            {
+                return isActive;
+            }
+
+            set
+            {
+                isActive = value;
+            }
         }
 
-        set
+        public virtual void Run()
         {
-            isActive = value;
+
         }
-    }
 
-    public virtual void Run()
-    {
+        public virtual void Clear()
+        {
 
-    }
-
-    public virtual void Clear()
-    {
+        }
 
     }
-
 }

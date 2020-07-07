@@ -159,6 +159,7 @@ public class Karakasa : Enemy
         if (stun || invincible || !inRange || !Input.GetMouseButtonDown(0) || !hitArea.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
             return;
 
+        CameraManager.Instance.MainPostEffect.GenerateRipple(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.05f, 1f, 0.5f, 0f, 1f, 0.5f);
         damaged = true;
         StartCoroutine(CoroutineNameDamageEffect);
         Damage(Mikochan.Instance.KamiAttack);

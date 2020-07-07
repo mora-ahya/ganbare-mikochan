@@ -3,59 +3,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CircleGrayScaleEffect : PostEffect
+namespace MyInitSet
 {
-    [Range(0f, 2f)]
-    public float radius = 1f;
-    float preRadius;
-
-    public Vector2 startPoint = default;
-    Vector2 preStartPoint;
-
-    void Awake()
+    public class CircleGrayScaleEffect : PostEffect
     {
-        Initialize();
-    }
+        [Range(0f, 2f)]
+        public float radius = 1f;
+        float preRadius;
 
-    void Initialize()
-    {
-        isActive = false;
-        material = new Material(shader);
-        cb = new CommandBuffer();
-        material.SetVector("_Start_Point", startPoint);
-        material.SetFloat("_Radius", radius);
+        public Vector2 startPoint = default;
+        Vector2 preStartPoint;
 
-        int tmpTexIdentifier = Shader.PropertyToID("PostEffectTmpTexture");
-        cb.GetTemporaryRT(tmpTexIdentifier, -1, -1);
-
-        cb.Blit(BuiltinRenderTextureType.CameraTarget, tmpTexIdentifier);
-
-        cb.Blit(tmpTexIdentifier, BuiltinRenderTextureType.CameraTarget, material);
-
-        cb.ReleaseTemporaryRT(tmpTexIdentifier);
-        //cb.Clear();
-
-    }
-
-    override public void Run()
-    {
-        //material.SetVector("_Start_Point", startPoint);
-        if (preStartPoint != startPoint)
+        void Awake()
         {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            isActive = false;
+            material = new Material(shader);
+            cb = new CommandBuffer();
             material.SetVector("_Start_Point", startPoint);
-            preStartPoint = startPoint;
-        }
-
-        if (preRadius != radius)
-        {
             material.SetFloat("_Radius", radius);
-            preRadius = radius;
+
+            int tmpTexIdentifier = Shader.PropertyToID("PostEffectTmpTexture");
+            cb.GetTemporaryRT(tmpTexIdentifier, -1, -1);
+
+            cb.Blit(BuiltinRenderTextureType.CameraTarget, tmpTexIdentifier);
+
+            cb.Blit(tmpTexIdentifier, BuiltinRenderTextureType.CameraTarget, material);
+
+            cb.ReleaseTemporaryRT(tmpTexIdentifier);
+            //cb.Clear();
+
         }
-        Graphics.ExecuteCommandBuffer(cb);
-    }
 
-    override public void Clear()
-    {
+        override public void Run()
+        {
+            //material.SetVector("_Start_Point", startPoint);
+            if (preStartPoint != startPoint)
+            {
+                material.SetVector("_Start_Point", startPoint);
+                preStartPoint = startPoint;
+            }
 
+            if (preRadius != radius)
+            {
+                material.SetFloat("_Radius", radius);
+                preRadius = radius;
+            }
+            Graphics.ExecuteCommandBuffer(cb);
+        }
+
+        override public void Clear()
+        {
+
+        }
     }
 }

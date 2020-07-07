@@ -14,6 +14,7 @@ public class PossessionItem : MonoBehaviour
     [SerializeField] GameObject throwAwayUI = default;
     [SerializeField] Text explain = default;
     [SerializeField] Text throwAwayAmountText = default;
+    [SerializeField] Transition transition = default;
 
     //左上572, 422.5
 
@@ -124,11 +125,7 @@ public class PossessionItem : MonoBehaviour
         explain.text = null;
         selectedItemBox = null;
         choices.SetActive(false);
-    }
-
-    public void UseItem(int i)
-    {
-        itemBoxes[i].UseItem();
+        transition.HealEffect();
     }
 
     public void ThrowAwayItem()

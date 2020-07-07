@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using MyInitSet;
 
 public delegate void FunctionalStateMachine();
 
@@ -29,6 +30,7 @@ public class GameSystem : MonoBehaviour
     FunctionalStateMachine scene;
 
     [SerializeField] CircleGrayScaleEffect cgse = default;
+    [SerializeField] Transition transition = default;
     [SerializeField] Image darkness = default;
     [SerializeField] Image whiteness = default;
 
@@ -48,9 +50,11 @@ public class GameSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        darkness.CrossFadeAlpha(0, 0, true);
         darkness.gameObject.SetActive(true);
+        darkness.CrossFadeAlpha(0, 3f, true);
+        transition.Init();
         Stop = false;
+        //CameraManager.Instance.MainPostEffect.SetEffectActive(MyPostEffects.SIMPLECOLOR_EFFECT, true);
     }
 
     // Update is called once per frame
@@ -60,6 +64,7 @@ public class GameSystem : MonoBehaviour
         {
             Menu.Instance.DisplayMenu();
         }
+
         /* //テスト実装
         if (Input.GetKeyDown(KeyCode.Z)) {
             if (CameraManager.Instance.MainPostEffect.GetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT) && enemyStop)
@@ -75,6 +80,7 @@ public class GameSystem : MonoBehaviour
                 enemyStop = true;
             }
         }
+        
 
         if (CameraManager.Instance.MainPostEffect.GetEffectActive(MyPostEffects.CIRCLE_GRAYSCALE_EFFECT))
         {
@@ -85,6 +91,8 @@ public class GameSystem : MonoBehaviour
             }
         }
         */
+        if (transition.IsRunning)
+            transition.Act();
         EventTextManager.Instance.Act();
         if (eventScene != null)
             eventScene.Act();

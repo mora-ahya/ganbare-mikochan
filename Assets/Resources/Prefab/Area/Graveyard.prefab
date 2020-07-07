@@ -36583,7 +36583,7 @@ MonoBehaviour:
   - {fileID: 2261953502646404918}
   handR: {fileID: 2261953501369963411}
   handL: {fileID: 2261953501618987145}
-  mouseTrans: {fileID: 2261953501850836271}
+  gashaMouseTransform: {fileID: 2261953501850836271}
   fbe: {fileID: 2261953501664031027}
 --- !u!1 &2261953502384833056
 GameObject:
@@ -38780,7 +38780,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42b52dc39768adb419cc88a43a0826a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  treasureInArea: []
   initStage: {fileID: 28228311830465089}
   currentStage: {fileID: 0}
   areaNumber: 0

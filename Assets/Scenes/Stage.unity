@@ -799,7 +799,7 @@ RectTransform:
   - {fileID: 1568817033}
   - {fileID: 855645677}
   m_Father: {fileID: 1272949616}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2829,6 +2829,94 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 386745253}
   m_CullTransparentMesh: 0
+--- !u!1 &391055478
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 391055479}
+  - component: {fileID: 391055481}
+  - component: {fileID: 391055480}
+  - component: {fileID: 391055482}
+  m_Layer: 5
+  m_Name: Transition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &391055479
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391055478}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.1, y: 1.1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1272949616}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &391055480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391055478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 0
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+--- !u!222 &391055481
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391055478}
+  m_CullTransparentMesh: 0
+--- !u!114 &391055482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391055478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e5c1e921be1b443a62bd17cef13c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panel: {fileID: 391055480}
 --- !u!1 &399630367
 GameObject:
   m_ObjectHideFlags: 0
@@ -2968,6 +3056,7 @@ GameObject:
   - component: {fileID: 407241225}
   - component: {fileID: 407241224}
   - component: {fileID: 407241229}
+  - component: {fileID: 407241232}
   m_Layer: 13
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3048,6 +3137,7 @@ MonoBehaviour:
   - {fileID: 407241225}
   - {fileID: 407241226}
   - {fileID: 407241229}
+  - {fileID: 407241232}
 --- !u!114 &407241228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3129,6 +3219,25 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &407241232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407241222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d5c9e3606eb7e14b9efc68f2ea42b66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 4800000, guid: 7abe56accc4eb0e489d77cdec590cec9, type: 3}
+  generatePosition: {x: 0, y: 0}
+  scope: 0.01
+  interval: 0.01
+  strength: 0
+  decreaseRate: 0
+  speed: 0
 --- !u!1 &411362232
 GameObject:
   m_ObjectHideFlags: 0
@@ -3909,7 +4018,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 475169754}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.36, y: 66.5, z: 0}
+  m_LocalPosition: {x: -13.6, y: 66.5, z: 0}
   m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_Children:
   - {fileID: 824170527}
@@ -4436,6 +4545,7 @@ MonoBehaviour:
   throwAwayUI: {fileID: 1767583382}
   explain: {fileID: 1190870960}
   throwAwayAmountText: {fileID: 63168931}
+  transition: {fileID: 391055482}
 --- !u!1 &592195876
 GameObject:
   m_ObjectHideFlags: 0
@@ -11025,7 +11135,7 @@ GameObject:
   - component: {fileID: 866839422}
   - component: {fileID: 866839421}
   m_Layer: 0
-  m_Name: System
+  m_Name: GameSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11044,6 +11154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cgse: {fileID: 407241229}
+  transition: {fileID: 391055482}
   darkness: {fileID: 1963145144}
   whiteness: {fileID: 1478676258}
   enemyStop: 0
@@ -12332,7 +12443,7 @@ RectTransform:
   - {fileID: 472865854}
   - {fileID: 1996173994}
   m_Father: {fileID: 1272949616}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -22294,11 +22405,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 1154845748}
   - {fileID: 110010421}
+  - {fileID: 1154845748}
   - {fileID: 1911026918}
   - {fileID: 1478676257}
   - {fileID: 1963145143}
+  - {fileID: 391055479}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -28126,6 +28238,7 @@ MonoBehaviour:
   itemImage: {fileID: 297348617}
   itemText: {fileID: 1480487931}
   transparent: {fileID: 21300000, guid: 2f6e87cab384d354a97f8926bbfdd3aa, type: 3}
+  transition: {fileID: 391055482}
 --- !u!1 &2023555824
 GameObject:
   m_ObjectHideFlags: 0

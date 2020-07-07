@@ -88,6 +88,7 @@
     <Compile Include="Assets\MyInitSet\MyPostEffects\GaussianBlurEffect.cs" />
     <Compile Include="Assets\MyInitSet\MyPostEffects\MyPostEffects.cs" />
     <Compile Include="Assets\MyInitSet\MyPostEffects\PostEffect.cs" />
+    <Compile Include="Assets\MyInitSet\MyPostEffects\Ripple.cs" />
     <Compile Include="Assets\MyInitSet\MyPostEffects\SimpleColorEffect.cs" />
     <Compile Include="Assets\MyInitSet\MyPostEffects\Test.cs" />
     <Compile Include="Assets\MyInitSet\MyPostEffects\Test2.cs" />
@@ -135,8 +136,10 @@
     <Compile Include="Assets\Script\System\GameSystem.cs" />
     <Compile Include="Assets\Script\System\Menu.cs" />
     <Compile Include="Assets\Script\System\TextLoader.cs" />
+    <Compile Include="Assets\Script\System\Transition.cs" />
     <Compile Include="Assets\Script\TitleScript\TitleManager.cs" />
     <None Include="Assets\Resources\Text\Graveyard\tutorial.txt" />
+    <None Include="Assets\MyInitSet\Shaders\StereoscopicWave.shader" />
     <None Include="Assets\Script\Shader\OutLine.shader" />
     <None Include="Assets\MyInitSet\Shaders\GaussianBlur.shader" />
     <None Include="Assets\Resources\Text\Graveyard\BossEvent.txt" />
@@ -146,12 +149,14 @@
     <None Include="Assets\SU3DJPFont\Fonts\MPlusTestflight63a\README_E.txt" />
     <None Include="Assets\Script\Shader\DamageEffect.shader" />
     <None Include="Assets\MyInitSet\Shaders\SimpleColor.shader" />
+    <None Include="Assets\MyInitSet\Shaders\Distortion.shader" />
     <None Include="Assets\MyInitSet\Shaders\PostEffect.shader" />
     <None Include="Assets\SU3DJPFont\readme_jp.txt" />
     <None Include="Assets\Anima2D\Licenses.txt" />
     <None Include="Assets\SU3DJPFont\readme.txt" />
     <None Include="Assets\MyInitSet\Shaders\Wave.shader" />
     <None Include="Assets\SU3DJPFont\Fonts\MPlusTestflight63a\README_J.txt" />
+    <None Include="Assets\MyInitSet\Shaders\Ripple.shader" />
     <None Include="Assets\Anima2D\Readme.txt" />
     <None Include="Assets\MyInitSet\Shaders\CircleGrayScale.shader" />
     <None Include="Assets\SU3DJPFont\Fonts\MPlusTestflight63a\LICENSE_J.txt" />

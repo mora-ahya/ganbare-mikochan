@@ -158,6 +158,7 @@ public class Hitotsumekozou : Enemy
         if (GameSystem.Instance.Stop)
             return;
 
+        CameraManager.Instance.MainPostEffect.GenerateRipple(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.05f, 1f, 0.5f, 0f, 1f, 0.5f);
         StartCoroutine(CoroutineNameDamageEffect);
         Damage(Mikochan.Instance.KamiAttack);
         if (hp <= 0 && act != StumblingProcess)

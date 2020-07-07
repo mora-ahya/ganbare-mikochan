@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MyInitSet;
 
 public class Mikochan : MonoBehaviour
 {
@@ -185,6 +186,7 @@ public class Mikochan : MonoBehaviour
         quickUseItem.SetItemInfo();
     }
 
+    //常に実行する関数
     public void Act()
     {
         mode();
@@ -463,6 +465,7 @@ public class Mikochan : MonoBehaviour
         if (!anim.IsName(animNameMikochanSeal) || anim.normalizedTime < 1.0f)
             return;
 
+        CameraManager.Instance.MainPostEffect.GenerateRipple(transform.position, 0.1f, 5f, 0.75f, 1.5f, 0.5f, 2.5f);
         GameSystem.Instance.Whiteness.gameObject.SetActive(true);
         GameSystem.Instance.Whiteness.CrossFadeAlpha(0f, 0.2f, false);
         animator.SetBool(animBoolIsSeal, false);
@@ -599,10 +602,10 @@ public class Mikochan : MonoBehaviour
 
         rb.velocity = Vector2.zero;
         TrapDamage(0.05f);
-        knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
-        rb.AddForce(knockBack, ForceMode2D.Impulse);
+        //knockBack.x = cc.offset.x > 0 ? -knockBackDir : knockBackDir;
+        //rb.AddForce(knockBack, ForceMode2D.Impulse);
         invincible = true;
-        damaged = true;
+        //damaged = true;
         sr.material = damageEffect;
     }
 
@@ -638,8 +641,9 @@ public class Mikochan : MonoBehaviour
         if (anim.normalizedTime < 1.0f)
             return;
 
-        GameSystem.Instance.Whiteness.gameObject.SetActive(true);
-        GameSystem.Instance.Whiteness.CrossFadeAlpha(0f, 0.2f, false);
+        CameraManager.Instance.MainPostEffect.GenerateRipple(sealTarget.transform.position, 0.1f, 5f, 0.75f, 1.5f, 0.5f, 2.5f);
+        //GameSystem.Instance.Whiteness.gameObject.SetActive(true);
+        //GameSystem.Instance.Whiteness.CrossFadeAlpha(0f, 0.2f, false);
         sealTarget.Sealed();
         sealTarget = null;
         mode = OperationalMode;

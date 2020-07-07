@@ -9,6 +9,7 @@ public class QuickUseItem : MonoBehaviour
     [SerializeField] Image itemImage = default;
     [SerializeField] Text itemText = default;
     [SerializeField] Sprite transparent = default;
+    [SerializeField] Transition transition = default;
 
     int selectNum = 0;
     ItemBox selectedItemBox;
@@ -21,10 +22,10 @@ public class QuickUseItem : MonoBehaviour
 
     public void Act()
     {
-        GetInputKey();
+        GetInput();
     }
 
-    void GetInputKey()
+    void GetInput()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -86,6 +87,7 @@ public class QuickUseItem : MonoBehaviour
             return;
 
         selectedItemBox.UseItem();
+        transition.HealEffect();
 
         if (possessionItem.ItemAmount == 0)
         {

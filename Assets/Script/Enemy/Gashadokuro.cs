@@ -24,7 +24,7 @@ public class Gashadokuro : Enemy
     [SerializeField] GashaShot[] gashaShots = default;
     [SerializeField] BoxCollider2D handR = default;
     [SerializeField] BoxCollider2D handL = default;
-    [SerializeField] Transform mouseTrans = default;
+    [SerializeField] Transform gashaMouseTransform = default;
     [SerializeField] FirstBossEvent fbe = default;
     WaitForSeconds wait = new WaitForSeconds(2f);//ダメージごとに短く
     AnimatorStateInfo anim;
@@ -85,13 +85,14 @@ public class Gashadokuro : Enemy
             return true;
         }
 
-        if (anim.IsName(animNameLaugh) && !HowlManager.Instance.gameObject.activeSelf)
+        if (anim.IsName(animNameLaugh) && !CameraManager.Instance.MainPostEffect.GetEffectActive(MyInitSet.MyPostEffects.RIPPLE_EFFECT))
         {
             if (!CameraManager.Instance.GetShake)
             {
                 CameraManager.Instance.Shake(true);
             }
-            HowlManager.Instance.Howl(mouseTrans.position, 0.5f);
+            //HowlManager.Instance.Howl(gashaMouseTransform.position, 0.5f);
+            CameraManager.Instance.MainPostEffect.GenerateRipple(gashaMouseTransform.position, 0.15f, 1f, 0.75f, 0f, 1.5f, 2.5f);
             return false;
         }
 
@@ -448,8 +449,8 @@ public class Gashadokuro : Enemy
 
     private IEnumerator ShotInterval() //ショットの間隔
     {
-        yield return GameSystem.Instance.ThreeSecond;
         animator.SetBool(animBoolOpenMouse, true);
+        yield return GameSystem.Instance.ThreeSecond;
         swingCount++;
         runCoroutine = false;
     }

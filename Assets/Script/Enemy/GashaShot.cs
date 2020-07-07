@@ -29,19 +29,13 @@ public class GashaShot : Enemy
         stun = false;
         act = DecideDir;
         v = sv;
+        counter = 0;
     }
-
-    /*
-    void Update()
-    {
-        MouseEvent();
-        act?.Invoke();
-    }*/
 
     public override void Act()
     {
         MouseEvent();
-        act?.Invoke();
+        act();
     }
 
     void DecideDir()
@@ -50,22 +44,12 @@ public class GashaShot : Enemy
         rb.AddForce((Mikochan.Instance.transform.position - transform.position).normalized * v, ForceMode2D.Impulse);
     }
 
-    void MouseEvent()
+    void KnockBack()
     {
-        if (stun || GameSystem.Instance.Stop || invincible || !inRange || !Input.GetMouseButtonDown(0) || !cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+        if (counter++ < 30)
             return;
 
-        stun = true;
-        Damage(Mikochan.Instance.KamiAttack);
-        rb.velocity *= -4;
-        StartCoroutine(CoroutineNameDamageEffect);
-        if (hp > 0)
-        {
-            StartCoroutine(CoroutineNameStop);
-            act = null;
-            return;
-        }
-        act = FlyAway;
+        act = DecideDir;
     }
 
     void FlyAway()
@@ -78,18 +62,33 @@ public class GashaShot : Enemy
         transform.Rotate(0, 0, -20);
     }
 
-    private IEnumerator DamageEffectCoroutine()
+    void MouseEvent()
+    {
+        if (act != DecideDir || GameSystem.Instance.Stop || !inRange || !Input.GetMouseButtonDown(0) || !cc.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition)))
+            return;
+
+        CameraManager.Instance.MainPostEffect.GenerateRipple(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.05f, 1f, 0.5f, 0f, 1f, 0.5f);
+        counter = 0;
+        Damage(Mikochan.Instance.KamiAttack);
+        rb.velocity *= -4;
+        StartCoroutine(CoroutineNameDamageEffect);
+        if (hp > 0)
+        {
+            act = KnockBack;
+            return;
+        }
+        act = FlyAway;
+        stun = true;
+        isSealed = true;
+    }
+
+    IEnumerator DamageEffectCoroutine()
     {
         DamageEffect();
         yield return null;
+        yield return null;
+        yield return null;
         ResetMaterial();
-    }
-
-    private IEnumerator Stop()
-    {
-        yield return GameSystem.Instance.HalfSecond;
-        stun = false;
-        act = DecideDir;
     }
 
     void OnTriggerStay2D(Collider2D other)

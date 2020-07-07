@@ -3,40 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class SimpleColorEffect : PostEffect
+namespace MyInitSet
 {
-
-    void Awake()
+    public class SimpleColorEffect : PostEffect
     {
-        Initialize();
-    }
 
-    private void Initialize()
-    {
-        isActive = false;
-        material = new Material(shader);
-        cb = new CommandBuffer();
+        void Awake()
+        {
+            Initialize();
+        }
 
-        int tmpTexIdentifier = Shader.PropertyToID("PostEffectTmpTexture");
-        cb.GetTemporaryRT(tmpTexIdentifier, -1, -1);
-        //cb.SetGlobalFloat("_WaveSize", x);
-        //material.SetFloat("_WaveSize", x);
+        private void Initialize()
+        {
+            isActive = false;
+            material = new Material(shader);
+            cb = new CommandBuffer();
 
-        cb.Blit(BuiltinRenderTextureType.CameraTarget, tmpTexIdentifier);
-        cb.Blit(tmpTexIdentifier, BuiltinRenderTextureType.CameraTarget, material);
+            int tmpTexIdentifier = Shader.PropertyToID("PostEffectTmpTexture");
+            cb.GetTemporaryRT(tmpTexIdentifier, -1, -1);
+            //cb.SetGlobalFloat("_WaveSize", x);
+            //material.SetFloat("_WaveSize", x);
 
-        cb.ReleaseTemporaryRT(tmpTexIdentifier);
-        //cb.Clear();
+            cb.Blit(BuiltinRenderTextureType.CameraTarget, tmpTexIdentifier);
+            cb.Blit(tmpTexIdentifier, BuiltinRenderTextureType.CameraTarget, material);
 
-    }
+            cb.ReleaseTemporaryRT(tmpTexIdentifier);
+            //cb.Clear();
 
-    override public void Run()
-    {
-        Graphics.ExecuteCommandBuffer(cb);
-    }
+        }
 
-    override public void Clear()
-    {
-        
+        override public void Run()
+        {
+            Graphics.ExecuteCommandBuffer(cb);
+        }
+
+        override public void Clear()
+        {
+
+        }
     }
 }
